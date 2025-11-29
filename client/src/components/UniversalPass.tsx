@@ -125,7 +125,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                    {/* User Info */}
                    <div className="mb-8">
                       <h3 className="text-lg text-[#193cb8] font-extrabold">{user.name}</h3>
-                      <p className="text-white/60 text-sm">{user.code}</p>
+                      <p className="text-sm text-[#6b6b80]">{user.code}</p>
                    </div>
 
                    <div className="w-full h-px bg-white/10 mb-6" />
