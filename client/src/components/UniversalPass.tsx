@@ -59,10 +59,10 @@ export default function UniversalPass({ user }: UniversalPassProps) {
   };
 
   return (
-    <div className="min-h-screen bg-subtle flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute top-[-20%] right-[-10%] w-[300px] h-[300px] bg-blue-100/50 rounded-full blur-[80px] animate-pulse-slow" />
-      <div className="absolute bottom-[-20%] left-[-10%] w-[300px] h-[300px] bg-emerald-100/50 rounded-full blur-[80px] animate-pulse-slow delay-1000" />
+    <div className="min-h-screen bg-[#e0e0e0] flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500">
+      {/* Background Elements - Subtle Neumorphic Shapes */}
+      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-[#e0e0e0] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] blur-[2px] opacity-60" />
+      <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-[#e0e0e0] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] blur-[2px] opacity-60" />
 
       {/* Live Time Indicator */}
       <motion.div 
@@ -70,8 +70,8 @@ export default function UniversalPass({ user }: UniversalPassProps) {
         animate={{ opacity: 1, y: 0 }}
         className="absolute top-6 right-6 text-right z-10"
       >
-        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Local Time</p>
-        <p className="text-sm font-mono text-slate-900">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Local Time</p>
+        <p className="text-sm font-mono text-slate-800">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
 
       <AnimatePresence mode="wait">
@@ -92,7 +92,12 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           >
-            <div className="glass-panel rounded-3xl p-8 shadow-2xl border border-white/60 backdrop-blur-xl relative overflow-hidden group">
+            <div 
+              className="rounded-[50px] p-8 relative overflow-hidden group bg-[#e0e0e0] transition-all duration-300"
+              style={{
+                boxShadow: '20px 20px 60px #bebebe, -20px -20px 60px #ffffff'
+              }}
+            >
               {/* Premium Texture Overlay */}
               <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/noise-lines.png')] pointer-events-none" />
               
@@ -105,12 +110,17 @@ export default function UniversalPass({ user }: UniversalPassProps) {
               <div className="flex flex-col items-center text-center space-y-8 relative z-10">
                 {/* QR Code (Primary) */}
                 <div className="relative">
-                  <div className="absolute -inset-4 bg-gradient-to-tr from-white/0 via-white/40 to-white/0 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] ring-1 ring-black/5 bg-white flex items-center justify-center relative z-10 transform transition-transform duration-500 group-hover:scale-105">
-                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
+                  {/* Neumorphic QR Container */}
+                  <div 
+                    className="w-32 h-32 rounded-3xl overflow-hidden flex items-center justify-center relative z-10 transform transition-transform duration-500 group-hover:scale-105 bg-[#e0e0e0]"
+                    style={{
+                      boxShadow: '5px 5px 10px #bebebe, -5px -5px 10px #ffffff'
+                    }}
+                  >
+                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" bgColor="#e0e0e0" />
                     {/* Baynunah Logo Centerpiece */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                       <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+                       <div className="w-8 h-8 bg-[#e0e0e0] rounded-full flex items-center justify-center shadow-[2px_2px_5px_#bebebe,-2px_-2px_5px_#ffffff]">
                          <ShieldCheck className="w-4 h-4 text-[#1E40AF]" />
                        </div>
                     </div>
@@ -118,7 +128,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   
                   {/* Live Status Pill */}
                   <div className={cn(
-                    "absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold border shadow-lg whitespace-nowrap uppercase tracking-widest flex items-center gap-1.5 backdrop-blur-md", 
+                    "absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold border shadow-sm whitespace-nowrap uppercase tracking-widest flex items-center gap-1.5", 
                     getRoleColor(user.role)
                   )}>
                     <span className="relative flex h-2 w-2">
@@ -131,22 +141,27 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                 {/* Identity */}
                 <div className="space-y-2 mt-6">
-                  <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{user.name}</h1>
+                  <h1 className="text-3xl font-bold text-slate-800 tracking-tight">{user.name}</h1>
                   <p className="text-slate-500 font-medium text-sm uppercase tracking-wide">{user.title}</p>
                   {user.department && (
-                    <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs font-medium mt-3 bg-slate-50 py-1 px-3 rounded-lg mx-auto w-fit">
+                    <div 
+                      className="flex items-center justify-center gap-1.5 text-slate-500 text-xs font-medium mt-3 py-1 px-3 rounded-lg mx-auto w-fit bg-[#e0e0e0]"
+                      style={{ boxShadow: 'inset 2px 2px 5px #bebebe, inset -2px -2px 5px #ffffff' }}
+                    >
                       <Briefcase className="w-3 h-3" />
                       <span>{user.department}</span>
                     </div>
                   )}
                 </div>
 
-                {/* Action Button */}
+                {/* Action Button - Neumorphic */}
                 <button 
                   onClick={toggleExpand}
-                  className="w-full py-4 bg-[#1E40AF] text-white rounded-2xl font-semibold shadow-lg shadow-blue-900/20 hover:bg-blue-800 hover:shadow-blue-900/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group overflow-hidden relative"
+                  className="w-full py-4 text-[#1E40AF] rounded-2xl font-bold tracking-wide transition-all active:scale-[0.98] flex items-center justify-center gap-2 group overflow-hidden relative bg-[#e0e0e0]"
+                  style={{
+                    boxShadow: '8px 8px 16px #bebebe, -8px -8px 16px #ffffff'
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                   <ShieldCheck className="w-5 h-5" />
                   <span>Access Dashboard</span>
                   <ChevronUp className="w-4 h-4 opacity-60 group-hover:-translate-y-0.5 transition-transform" />
