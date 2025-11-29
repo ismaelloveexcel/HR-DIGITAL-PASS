@@ -166,7 +166,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
               {/* Security Strip - Minimal */}
               <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50", getRoleGradient(user.role))} />
 
-              <div className="flex flex-col items-center text-center relative z-10 mt-6">
+              <div className="flex flex-col items-center text-center relative z-10 mt-2">
                 {/* Logo */}
                 <div className="h-6 mb-2 flex items-center justify-center w-full">
                   <img src={logo} alt="Baynunah" className="h-full object-contain invert opacity-80" />
