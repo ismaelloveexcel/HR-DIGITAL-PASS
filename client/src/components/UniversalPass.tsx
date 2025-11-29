@@ -70,7 +70,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 font-sans bg-[#ffffffde]">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 font-sans bg-[#ffffffde] pt-[0px] pb-[0px] pl-[0px] pr-[0px]">
       {/* Live Time Indicator - minimalist */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
