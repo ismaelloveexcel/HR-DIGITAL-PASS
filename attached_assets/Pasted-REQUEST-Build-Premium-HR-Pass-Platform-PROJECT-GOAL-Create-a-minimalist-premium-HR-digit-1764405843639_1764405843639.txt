@@ -1,0 +1,122 @@
+REQUEST: Build Premium HR Pass Platform
+
+## 🎯 PROJECT GOAL
+Create a minimalist, premium HR digital pass system for Baynunah with universal template for Candidates, Managers, and Onboarding.
+
+## 🎨 DESIGN SPECIFICATIONS
+- **Theme**: Ultra-minimalist white/light backgrounds (#FFFFFF to #F9FAFB)
+- **Colors**: 
+  - Primary: #1E40AF (dark blue for text/buttons)
+  - Success: #059669 (muted green for progress)
+  - Neutral: #6B7280 (grey for icons/subtle elements)
+- **Effects**: 
+  - Glassmorphism only: `backdrop-blur: 20px`, `rgba(255,255,255,0.05)` backgrounds
+  - No gradients - flat solids only
+  - Soft shadows: `0 4px 6px rgba(0,0,0,0.02)`
+  - Rounded corners: 12-20px
+- **Typography**: Inter font (weights 300-700)
+- **Animations**: Framer Motion fade-in load, scale hover
+
+## 📱 CORE FEATURES
+1. **Universal Pass Template** - Single component for all pass types
+2. **Code-based Access** - URLs: `/pass/PASS-001` (Candidate), `/pass/REQ-001` (Manager), `/pass/ONB-001` (Onboarding)
+3. **Two-Step Experience**:
+   - Compact card view (avatar, name, title, QR, "Access Pass" button)
+   - Expanded dashboard view (stats, contact info, bottom nav)
+4. **QR Integration** - `qrcode.react` for scan/save functionality
+5. **PWA Ready** - Manifest for "Add to Home Screen" wallet experience
+
+## 🛠 TECH STACK
+- **Framework**: Next.js 14 with App Router
+- **Styling**: Tailwind CSS (extend colors to match design specs)
+- **Icons**: Lucide React (professional, simple icons)
+- **Animations**: Framer Motion
+- **Database**: PostgreSQL + Drizzle ORM
+- **QR**: qrcode.react
+
+## 📁 FILE STRUCTURE TO CREATE
+app/
+├── layout.tsx (with Inter font)
+├── page.tsx (landing page)
+├── pass/
+│ └── [code]/
+│ └── page.tsx (universal pass component)
+└── api/
+└── access/
+└── [code]/
+└── route.ts (API endpoint)
+
+lib/
+├── db.ts (Drizzle config)
+└── schema.ts (database schema)
+
+public/
+└── manifest.json (PWA config)
+
+text
+
+## 🚀 IMMEDIATE ACTIONS NEEDED
+
+### 1. INSTALL DEPENDENCIES
+```bash
+npm install lucide-react qrcode.react framer-motion drizzle-orm pg @neondatabase/serverless
+npm install -D drizzle-kit @types/qrcode.react
+2. CREATE CORE FILES
+app/layout.tsx - Root layout with Inter font
+app/page.tsx - Landing page with access code input
+app/pass/[code]/page.tsx - Universal pass component (use provided code)
+lib/db.ts - Drizzle database configuration
+lib/schema.ts - Database schema (candidates, managers, onboarding_employees)
+public/manifest.json - PWA manifest
+
+3. CONFIGURE ENVIRONMENT
+env
+DATABASE_URL=your_postgres_connection_string
+4. IMPLEMENT KEY COMPONENTS
+Universal Pass Template must include:
+
+Compact view (avatar, name, title, QR, blue button)
+
+Expanded view (header, stat cards, contact info, bottom nav)
+
+Role-specific content based on code prefix (PASS-/REQ-/ONB-)
+
+Professional Lucide icons (no emoji/childish icons)
+
+Smooth Framer Motion transitions
+
+Bottom Navigation:
+
+Home, Timeline, Progress, Actions, Notes
+
+Active state in blue, inactive in grey
+
+Fixed position with glassmorphism effect
+
+🎯 SUCCESS CRITERIA
+✅ Clean, premium white aesthetic with proper glassmorphism
+
+✅ Single universal component handling all pass types
+
+✅ Professional Lucide icons (no amateurish elements)
+
+✅ Smooth animations and mobile-responsive
+
+✅ QR codes functional for scan/save
+
+✅ PWA manifest for wallet experience
+
+✅ Role-specific content based on code prefix
+
+📋 DELIVERABLES
+Complete Next.js application with all specified files
+
+Universal pass component with two-step interaction
+
+Database schema and API endpoints
+
+PWA manifest and proper mobile optimization
+
+Professional, minimalist design matching specifications
+
+Priority: Start with universal pass component, then landing page, then API/database integration.
