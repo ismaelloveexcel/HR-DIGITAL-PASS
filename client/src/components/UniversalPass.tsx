@@ -89,7 +89,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/10 backdrop-blur-md"
           >
-             <div className="bg-[#2C41AC] w-full max-w-xs rounded-[32px] p-6 text-white relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)]">
+             <div className="w-full max-w-xs rounded-[32px] p-6 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] bg-[#1f337f3d] text-[#000000]">
                 {/* Close Button */}
                 <button 
                   onClick={() => setShowVerification(false)}
