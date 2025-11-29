@@ -132,7 +132,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                      }}
                      className="w-full py-3.5 rounded-xl hover:bg-white/20 border border-white/10 transition-all flex items-center justify-center gap-2 text-sm bg-[#e8eafa] text-[#9c9c9c] font-semibold shrink-0"
                    >
-                     <span className="text-[#85848a]">View Full Profile</span>
+                     <span className="text-[#85848a] text-[16px]">View Full Profile</span>
                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                    </button>
                 </div>
