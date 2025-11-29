@@ -60,10 +60,10 @@ export default function UniversalPass({ user }: UniversalPassProps) {
           >
             <div className="glass-panel rounded-3xl p-8 shadow-xl border border-white/60 backdrop-blur-xl">
               <div className="flex flex-col items-center text-center space-y-6">
-                {/* Avatar */}
+                {/* QR Code (Primary) */}
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg ring-4 ring-white">
-                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg ring-4 ring-white bg-white flex items-center justify-center">
+                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={80} fgColor="#1E40AF" />
                   </div>
                   <div className={cn("absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-medium border shadow-sm whitespace-nowrap uppercase tracking-wider", getRoleColor(user.role))}>
                     {user.role}
@@ -82,14 +82,11 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   )}
                 </div>
 
-                {/* QR Code */}
-                <div className="p-4 bg-white rounded-2xl shadow-inner border border-slate-100">
-                  <QRCodeSVG 
-                    value={`https://baynunah-pass.com/pass/${user.code}`} 
-                    size={160}
-                    fgColor="#1E40AF"
-                    level="H"
-                  />
+                {/* Photo ID */}
+                <div className="p-2 bg-white rounded-2xl shadow-inner border border-slate-100">
+                  <div className="w-40 h-40 rounded-xl overflow-hidden">
+                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                  </div>
                 </div>
                 <p className="text-xs text-slate-400 font-mono tracking-widest">{user.code}</p>
 
