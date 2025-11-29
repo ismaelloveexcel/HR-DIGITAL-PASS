@@ -89,33 +89,33 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/10 backdrop-blur-md font-semibold"
           >
-             <div className="w-full max-w-xs rounded-[32px] p-6 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] bg-[#1f337f3d] text-[#000000]">
+             <div className="w-full max-w-[340px] rounded-[32px] p-5 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] bg-[#1f337f3d] text-[#000000] max-h-[calc(100vh-32px)] overflow-y-auto no-scrollbar flex flex-col">
                 {/* Close Button */}
                 <button 
                   onClick={() => setShowVerification(false)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10"
                 >
                   <span className="text-xl font-light">&times;</span>
                 </button>
 
-                <div className="flex flex-col items-center text-center pt-4 pb-2">
+                <div className="flex flex-col items-center text-center pt-2 pb-2">
                    {/* Icon */}
-                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4 ring-1 ring-white/20">
-                     <span className="text-2xl font-light">#</span>
+                   <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mb-3 ring-1 ring-white/20 shrink-0">
+                     <span className="text-xl font-light">#</span>
                    </div>
 
-                   <h2 className="text-lg font-bold mb-1 bg-[#08004f00] text-[#193cb8]">Verification Code</h2>
-                   <p className="text-xs mb-8 text-[#0f0000]">Scan the QR code or enter manually</p>
+                   <h2 className="text-lg font-bold mb-1 bg-[#08004f00] text-[#193cb8] shrink-0">Verification Code</h2>
+                   <p className="text-xs mb-4 text-[#0f0000] shrink-0">Scan the QR code or enter manually</p>
 
                    {/* Large QR Card */}
-                   <div className="bg-white p-4 rounded-3xl w-full aspect-square flex items-center justify-center mb-6 shadow-lg">
-                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={200} fgColor="#000000" />
+                   <div className="bg-white p-3 rounded-3xl w-48 aspect-square flex items-center justify-center mb-4 shadow-lg shrink-0">
+                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={160} fgColor="#000000" />
                    </div>
 
-                   <p className="text-white/40 text-[10px] uppercase tracking-widest mb-3">OR enter the code manually</p>
+                   <p className="text-white/40 text-[10px] uppercase tracking-widest mb-2 shrink-0">OR enter the code manually</p>
 
                    {/* Code Box */}
-                   <div className="w-full rounded-xl p-4 flex items-center justify-center relative mb-8 border border-white/10 text-[#193cb8] font-semibold text-[20px] bg-[#e8eafa]">
+                   <div className="w-full rounded-xl p-3 flex items-center justify-center relative mb-4 border border-white/10 text-[#193cb8] font-semibold text-[18px] bg-[#e8eafa] shrink-0">
                       <span className="font-mono text-sm tracking-widest opacity-90 text-[#85848a] bg-[#00000000]">N8EC-PS5D-9PKD</span>
                       <button className="absolute right-4 opacity-60 hover:opacity-100">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
@@ -123,19 +123,19 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                    </div>
 
                    {/* User Info */}
-                   <div className="mb-8">
+                   <div className="mb-4 shrink-0">
                       <h3 className="text-lg text-[#193cb8] font-extrabold">{user.name}</h3>
                       <p className="text-sm text-[#6b6b80] font-bold">{user.code}</p>
                    </div>
 
-                   <div className="w-full h-px bg-white/10 mb-6" />
+                   <div className="w-full h-px bg-white/10 mb-4 shrink-0" />
 
                    <button 
                      onClick={() => {
                        setShowVerification(false);
                        setExpanded(true);
                      }}
-                     className="w-full py-3.5 rounded-xl hover:bg-white/20 border border-white/10 transition-all flex items-center justify-center gap-2 text-sm bg-[#e8eafa] text-[#9c9c9c] font-semibold"
+                     className="w-full py-3.5 rounded-xl hover:bg-white/20 border border-white/10 transition-all flex items-center justify-center gap-2 text-sm bg-[#e8eafa] text-[#9c9c9c] font-semibold shrink-0"
                    >
                      <span className="text-[#85848a]">View Full Profile</span>
                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
