@@ -173,7 +173,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 </div>
 
                 {/* Pass Type */}
-                <p className="font-bold tracking-[0.2em] text-slate-400 uppercase mb-8 text-[16px]">
+                <p className="tracking-[0.2em] text-slate-400 uppercase mb-8 text-[20px] font-medium">
                   {getPassType(user.role)}
                 </p>
 
