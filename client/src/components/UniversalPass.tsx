@@ -191,7 +191,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                       <QRCodeSVG 
                         value={`https://baynunah-pass.com/pass/${user.code}`} 
                         size={120} 
-                        fgColor="#FFFFFF" 
+                        fgColor="#64748b" 
                         bgColor="transparent"
                       />
                     </div>
