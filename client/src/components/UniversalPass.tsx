@@ -201,7 +201,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                 {/* Identity */}
                 <div className="space-y-1 mt-2">
-                  <h1 className="text-2xl font-bold text-slate-800 tracking-tight mt-[0px] mb-[0px]">{user.name}</h1>
+                  <h1 className="text-2xl font-bold tracking-tight mt-[0px] mb-[0px] text-[#193cb8]">{user.name}</h1>
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-wider pt-[5px] pb-[5px]">{user.title}</p>
                   {user.department && (
                     <p className="text-slate-400 text-[10px] font-medium mt-1">
