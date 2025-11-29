@@ -183,14 +183,21 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   )}
                 </div>
 
-                {/* Action Button - Clean & Flat */}
-                <button 
-                  onClick={toggleExpand}
-                  className="w-full py-3.5 bg-[#1E40AF] text-white rounded-xl font-medium text-sm tracking-wide shadow-lg shadow-blue-900/10 hover:bg-blue-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
+                {/* Action Button - Reveal on Hover */}
+                <motion.div 
+                  className="w-full overflow-hidden h-0 group-hover:h-[60px] transition-all duration-300 ease-in-out flex items-center justify-center"
                 >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Open Pass</span>
-                </button>
+                  <button 
+                    onClick={toggleExpand}
+                    className="w-full py-3.5 bg-[#1E40AF] text-white rounded-xl font-medium text-sm tracking-wide shadow-lg shadow-blue-900/10 hover:bg-blue-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Open Pass</span>
+                  </button>
+                </motion.div>
+                
+                {/* Bottom indicator when not hovering */}
+                <div className="h-1 w-12 bg-slate-300 rounded-full mx-auto group-hover:w-0 group-hover:opacity-0 transition-all duration-300 mt-4" />
               </div>
             </div>
           </motion.div>
