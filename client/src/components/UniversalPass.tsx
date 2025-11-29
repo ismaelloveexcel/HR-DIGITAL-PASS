@@ -225,38 +225,57 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                 {/* Recruitment Stage Indicator - Reveal on Hover */}
                 <motion.div 
-                  className="w-full overflow-hidden h-0 group-hover:h-auto min-h-0 group-hover:min-h-[80px] transition-all duration-500 ease-in-out flex flex-col items-center justify-center pt-2"
+                  className="w-full overflow-hidden h-0 group-hover:h-auto min-h-0 group-hover:min-h-[100px] transition-all duration-500 ease-in-out flex flex-col items-center justify-center pt-3"
                 >
-                  <div className="w-full bg-slate-50 rounded-xl p-3 border border-slate-100 shadow-inner">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recruitment Stage</span>
-                      <span className="text-[10px] font-bold text-[#1E40AF] uppercase tracking-wider">Interview</span>
+                  <div className="w-full bg-gradient-to-b from-white to-slate-50 rounded-2xl p-4 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex flex-col items-start">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Current Status</span>
+                          <span className="text-xs font-black text-[#1E40AF] tracking-wide">Interview Stage</span>
+                      </div>
+                      <div className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center text-[#1E40AF] shadow-sm border border-blue-100">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      </div>
                     </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="flex gap-1 h-1.5 mb-2">
-                      {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
-                        const currentStageIndex = 3; // Interview is index 3 (0-based)
-                        const isActive = i === currentStageIndex;
-                        const isCompleted = i < currentStageIndex;
+
+                    {/* Stepper */}
+                    <div className="relative flex items-center justify-between w-full mb-1 px-1">
+                        {/* Connecting Line Base */}
+                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[2px] bg-slate-100 -z-10 rounded-full" />
                         
-                        return (
-                          <div 
-                            key={stage} 
-                            className={cn(
-                              "h-full rounded-full flex-1 transition-colors duration-300",
-                              isActive ? "bg-[#1E40AF]" : 
-                              isCompleted ? "bg-emerald-400" : 
-                              "bg-slate-200"
-                            )} 
-                          />
-                        );
-                      })}
+                        {/* Connecting Line Active */}
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-[#1E40AF] -z-10 rounded-full transition-all duration-1000" style={{ width: '60%' }} />
+
+                        {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
+                          const currentStageIndex = 3;
+                          const isActive = i === currentStageIndex;
+                          const isCompleted = i < currentStageIndex;
+                          
+                          return (
+                              <div key={stage} className="relative group/dot flex flex-col items-center justify-center">
+                                  <div className={cn(
+                                      "w-2.5 h-2.5 rounded-full border-[2px] transition-all duration-300 z-10 box-border",
+                                      isActive ? "bg-white border-[#1E40AF] scale-125 shadow-[0_0_0_3px_rgba(30,64,175,0.15)]" : 
+                                      isCompleted ? "bg-[#1E40AF] border-[#1E40AF]" : 
+                                      "bg-white border-slate-200"
+                                  )} />
+                                  
+                                  {/* Tooltip for stages */}
+                                  <div className={cn(
+                                      "absolute -bottom-5 whitespace-nowrap transition-all duration-300",
+                                      isActive ? "opacity-100 transform translate-y-0" : "opacity-0 transform -translate-y-1"
+                                  )}>
+                                      <span className="text-[8px] font-bold text-[#1E40AF] tracking-tight">{stage}</span>
+                                  </div>
+                              </div>
+                          );
+                        })}
                     </div>
                     
-                    <p className="text-[9px] text-slate-400 text-center leading-tight">
-                      You are currently in the <span className="font-bold text-slate-600">Interview</span> stage.
-                    </p>
+                    <div className="mt-5 pt-2 border-t border-slate-100 flex justify-between items-center">
+                        <span className="text-[9px] text-slate-400 font-medium tracking-wide">Step 4 of 6</span>
+                        <span className="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100/50">On Track</span>
+                    </div>
                   </div>
                 </motion.div>
                 
