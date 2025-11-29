@@ -60,6 +60,15 @@ export default function UniversalPass({ user }: UniversalPassProps) {
     }
   };
 
+  const getPassType = (role: string) => {
+    switch(role) {
+      case 'candidate': return 'CANDIDATE PASS';
+      case 'manager': return 'STAFF PASS';
+      case 'onboarding': return 'ONBOARDING PASS';
+      default: return 'UNIVERSAL PASS';
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 font-sans bg-[#ffffffde]">
       {/* Live Time Indicator - minimalist */}
@@ -157,14 +166,19 @@ export default function UniversalPass({ user }: UniversalPassProps) {
               {/* Security Strip - Minimal */}
               <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50", getRoleGradient(user.role))} />
 
-              <div className="flex flex-col items-center text-center space-y-8 relative z-10 mt-2">
+              <div className="flex flex-col items-center text-center relative z-10 mt-6">
                 {/* Logo */}
-                <div className="h-12 mb-[-1rem] flex items-center justify-center">
-                  <img src={logo} alt="Baynunah" className="h-full object-contain invert opacity-90" />
+                <div className="h-6 mb-2 flex items-center justify-center w-full">
+                  <img src={logo} alt="Baynunah" className="h-full object-contain invert opacity-80" />
                 </div>
 
+                {/* Pass Type */}
+                <p className="text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase mb-8">
+                  {getPassType(user.role)}
+                </p>
+
                 {/* QR Code (Primary) */}
-                <div className="relative flex flex-col items-center group cursor-pointer" onClick={() => setShowVerification(true)}>
+                <div className="relative flex flex-col items-center group cursor-pointer mb-6" onClick={() => setShowVerification(true)}>
                   <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm group-hover:scale-105 transition-transform duration-300">
                     <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
                   </div>
