@@ -76,7 +76,8 @@ export default function Landing() {
       </motion.div>
 
       <div className="absolute bottom-6 text-center w-full">
-        <p className="text-[10px] text-slate-300 font-mono">SECURE • ENCRYPTED • DIGITAL</p>
+        <p className="text-[10px] text-slate-300 font-mono mb-1">SECURE • ENCRYPTED • DIGITAL</p>
+        <p className="text-[10px] text-slate-300 font-mono opacity-60">Concept by Ismael</p>
       </div>
     </div>
   );
