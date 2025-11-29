@@ -92,54 +92,54 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/10 backdrop-blur-md font-semibold"
           >
-             <div className="w-full max-w-[340px] rounded-[32px] p-5 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] text-[#000000] max-h-[calc(100vh-32px)] overflow-y-auto no-scrollbar flex flex-col bg-[#ffffff]">
+             <div className="w-full max-w-[320px] rounded-[24px] p-4 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] text-[#000000] flex flex-col bg-[#ffffff]">
                 {/* Close Button */}
                 <button 
                   onClick={() => setShowVerification(false)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10"
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10"
                 >
-                  <span className="text-xl font-light">&times;</span>
+                  <span className="text-xl font-light text-slate-400">&times;</span>
                 </button>
 
-                <div className="flex flex-col items-center text-center pt-4 pb-4">
-                   <h2 className="text-2xl font-bold tracking-tight mb-1 text-[#1E40AF] shrink-0">Verification Code</h2>
-                   <p className="mb-6 shrink-0 text-slate-500 text-sm font-medium">Scan the QR code or enter manually</p>
+                <div className="flex flex-col items-center text-center pt-2 pb-2">
+                   <h2 className="text-lg font-bold tracking-tight mb-0.5 text-[#1E40AF] shrink-0">Verification Code</h2>
+                   <p className="mb-3 shrink-0 text-slate-500 text-xs font-medium">Scan QR code or enter manually</p>
 
                    {/* Large QR Card */}
                    <div 
-                    className="bg-white p-4 rounded-3xl w-52 aspect-square flex items-center justify-center mb-6 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50 cursor-pointer hover:scale-105 transition-transform"
+                    className="bg-white p-3 rounded-2xl w-40 aspect-square flex items-center justify-center mb-3 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50 cursor-pointer hover:scale-105 transition-transform"
                     onClick={() => setLocation('/candidate-profile')}
                    >
-                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={180} fgColor="#1e293b" />
+                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={130} fgColor="#1e293b" />
                    </div>
 
-                   <p className="text-slate-400 text-[11px] uppercase tracking-[0.2em] font-bold mb-3 shrink-0">OR enter the code manually</p>
+                   <p className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold mb-2 shrink-0">OR enter code</p>
 
                    {/* Code Box */}
-                   <div className="w-full rounded-2xl p-4 flex items-center justify-center relative mb-6 border border-slate-100 text-slate-700 bg-slate-50/80 shrink-0 shadow-inner">
-                      <span className="font-mono tracking-[0.2em] text-xl font-bold">N8EC-PS5D-9PKD</span>
-                      <button className="absolute right-4 text-slate-400 hover:text-[#1E40AF] transition-colors">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                   <div className="w-full rounded-xl p-2.5 flex items-center justify-center relative mb-3 border border-slate-100 text-slate-700 bg-slate-50/80 shrink-0 shadow-inner">
+                      <span className="font-mono tracking-[0.2em] text-base font-bold">N8EC-PS5D-9PKD</span>
+                      <button className="absolute right-3 text-slate-400 hover:text-[#1E40AF] transition-colors">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
                    </div>
 
                    {/* User Info */}
-                   <div className="mb-6 shrink-0 space-y-0.5">
-                      <h3 className="text-[#1E40AF] text-xl font-bold tracking-tight">{user.name}</h3>
-                      <p className="text-slate-500 font-mono text-xs tracking-wider">{user.code}</p>
+                   <div className="mb-3 shrink-0 space-y-0">
+                      <h3 className="text-[#1E40AF] text-base font-bold tracking-tight">{user.name}</h3>
+                      <p className="text-slate-500 font-mono text-[10px] tracking-wider">{user.code}</p>
                    </div>
 
-                   <div className="w-full h-px bg-slate-100 mb-5 shrink-0" />
+                   <div className="w-full h-px bg-slate-100 mb-3 shrink-0" />
 
                    <button 
                      onClick={() => {
                        setShowVerification(false);
                        setLocation('/candidate-profile');
                      }}
-                     className="w-full py-4 rounded-2xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center gap-2 text-sm bg-slate-50 text-slate-600 hover:text-[#1E40AF] font-semibold shrink-0 group"
+                     className="w-full py-2.5 rounded-xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center gap-2 text-xs bg-slate-50 text-slate-600 hover:text-[#1E40AF] font-semibold shrink-0 group"
                    >
                      <span className="group-hover:translate-x-[-2px] transition-transform">View Full Profile</span>
-                     <svg className="group-hover:translate-x-[2px] transition-transform" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                     <svg className="group-hover:translate-x-[2px] transition-transform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                    </button>
                 </div>
              </div>
