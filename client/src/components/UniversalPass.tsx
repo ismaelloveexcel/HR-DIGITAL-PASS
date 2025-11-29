@@ -99,11 +99,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 </button>
 
                 <div className="flex flex-col items-center text-center pt-2 pb-2">
-                   {/* Icon */}
-                   <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mb-3 ring-1 ring-white/20 shrink-0">
-                     <span className="text-xl font-light">#</span>
-                   </div>
-
                    <h2 className="text-lg font-bold mb-1 bg-[#08004f00] text-[#193cb8] shrink-0">Verification Code</h2>
                    <p className="text-xs mb-4 text-[#0f0000] shrink-0">Scan the QR code or enter manually</p>
 
