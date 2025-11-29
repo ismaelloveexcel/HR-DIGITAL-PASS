@@ -223,71 +223,37 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   )}
                 </div>
 
-                {/* Recruitment Stage Indicator - Reveal on Hover */}
-                <motion.div 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleExpand();
-                  }}
-                  className="w-full overflow-hidden transition-all duration-500 ease-in-out flex flex-col items-center justify-center pt-2 cursor-pointer"
-                  initial={false}
-                >
-                  <div className="w-full bg-gradient-to-b from-white to-slate-50 rounded-2xl p-4 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] group/widget hover:shadow-[0_8px_30px_-4px_rgba(30,64,175,0.1)] transition-shadow">
-                    <div className="flex justify-between items-center mb-1 group-hover:group-hover/widget:mb-4 transition-all duration-300">
-                      <div className="flex flex-col items-start">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Current Status</span>
-                          <span className="text-xs font-black text-[#1E40AF] tracking-wide">Interview Stage</span>
-                      </div>
-                      <div className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center text-[#1E40AF] shadow-sm border border-blue-100 group-hover/widget:bg-[#1E40AF] group-hover/widget:text-white transition-colors duration-300">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                      </div>
+                {/* Recruitment Stage Indicator - Static & Minimal */}
+                <div className="w-full mt-4 pt-4 border-t border-slate-100">
+                  <div className="flex justify-between items-end mb-2">
+                    <div className="flex flex-col text-left">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
+                      <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide">Interview</span>
                     </div>
-
-                    {/* Stepper - Hidden by default, reveals on hover */}
-                    <div className="h-0 opacity-0 group-hover/widget:h-auto group-hover/widget:opacity-100 overflow-hidden transition-all duration-500 ease-in-out">
-                        <div className="relative flex items-center justify-between w-full mb-1 px-1 pt-2">
-                            {/* Connecting Line Base */}
-                            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[2px] bg-slate-100 -z-10 rounded-full" />
-                            
-                            {/* Connecting Line Active */}
-                            <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-[#1E40AF] -z-10 rounded-full transition-all duration-1000" style={{ width: '60%' }} />
-
-                            {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
-                              const currentStageIndex = 3;
-                              const isActive = i === currentStageIndex;
-                              const isCompleted = i < currentStageIndex;
-                              
-                              return (
-                                  <div key={stage} className="relative group/dot flex flex-col items-center justify-center">
-                                      <div className={cn(
-                                          "w-2.5 h-2.5 rounded-full border-[2px] transition-all duration-300 z-10 box-border",
-                                          isActive ? "bg-white border-[#1E40AF] scale-125 shadow-[0_0_0_3px_rgba(30,64,175,0.15)]" : 
-                                          isCompleted ? "bg-[#1E40AF] border-[#1E40AF]" : 
-                                          "bg-white border-slate-200"
-                                      )} />
-                                      
-                                      {/* Tooltip for stages */}
-                                      <div className={cn(
-                                          "absolute -bottom-5 whitespace-nowrap transition-all duration-300",
-                                          isActive ? "opacity-100 transform translate-y-0" : "opacity-0 transform -translate-y-1"
-                                      )}>
-                                          <span className="text-[8px] font-bold text-[#1E40AF] tracking-tight">{stage}</span>
-                                      </div>
-                                  </div>
-                              );
-                            })}
-                        </div>
-                        
-                        <div className="mt-6 pt-2 border-t border-slate-100 flex justify-between items-center">
-                            <span className="text-[9px] text-slate-400 font-medium tracking-wide">Step 4 of 6</span>
-                            <div className="flex items-center gap-2">
-                                <span className="text-[9px] text-slate-400 group-hover/widget:text-blue-600 font-medium transition-colors">Click to view details</span>
-                                <span className="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100/50">On Track</span>
-                            </div>
-                        </div>
-                    </div>
+                    <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
                   </div>
-                </motion.div>
+                  
+                  {/* Simple Segmented Progress Bar */}
+                  <div className="flex gap-1 h-1.5 w-full">
+                    {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
+                      const currentStageIndex = 3; // Interview
+                      const isActive = i === currentStageIndex;
+                      const isCompleted = i < currentStageIndex;
+                      
+                      return (
+                        <div 
+                          key={stage} 
+                          className={cn(
+                            "h-full rounded-full flex-1 transition-colors",
+                            isActive ? "bg-[#1E40AF]" : 
+                            isCompleted ? "bg-emerald-400" : 
+                            "bg-slate-200"
+                          )} 
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
                 
                 {/* Bottom indicator when not hovering */}
                 <div className="h-1 w-12 bg-slate-300 rounded-full mx-auto group-hover:w-0 group-hover:opacity-0 transition-all duration-300 mt-4" />
