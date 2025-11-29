@@ -84,7 +84,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             className="w-full max-w-[320px] relative z-10"
           >
             <div 
-              className="bg-[#e8e8e8] rounded-[40px] p-8 relative group transition-all duration-300"
+              className="rounded-[40px] p-8 relative group transition-all duration-300 bg-[#ffffff]"
               style={{
                 boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
               }}
