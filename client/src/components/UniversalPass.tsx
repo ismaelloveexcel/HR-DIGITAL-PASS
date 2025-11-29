@@ -198,7 +198,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   </div>
                   
                   {/* Status Dot */}
-                  <div className="px-3 py-1 rounded-full text-[10px] font-medium border border-slate-100 shadow-sm whitespace-nowrap uppercase tracking-wider flex items-center gap-1.5 bg-white/80 backdrop-blur-sm text-slate-500 mt-[0px] mb-[0px]">
+                  <div className="px-3 py-1 rounded-full text-[10px] font-medium border border-slate-100 shadow-sm whitespace-nowrap uppercase tracking-wider flex items-center gap-1.5 bg-white/80 backdrop-blur-sm text-slate-500 mt-[0px] mb-[0px] pt-[0px] pb-[0px]">
                     <span className={cn("w-1.5 h-1.5 rounded-full", user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
                     {user.status}
                   </div>
