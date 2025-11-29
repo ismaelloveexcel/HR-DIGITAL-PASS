@@ -59,8 +59,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#e8e8e8] flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 font-sans">
-      
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 font-sans bg-[#ffffffde]">
       {/* Live Time Indicator - minimalist */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -70,7 +69,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
         <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Local Time</p>
         <p className="text-sm font-mono text-slate-600">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
-
       <AnimatePresence mode="wait">
         {!expanded ? (
           <motion.div 
