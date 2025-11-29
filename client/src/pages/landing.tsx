@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { ArrowRight, ShieldCheck, Search } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
+import logo from '@assets/baynunah-logo_1764408063481.png';
 
 export default function Landing() {
   const [code, setCode] = useState('');
@@ -26,8 +27,8 @@ export default function Landing() {
         className="w-full max-w-md relative z-10 flex flex-col items-center text-center"
       >
         {/* Logo Area */}
-        <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center mb-8 text-[#1E40AF]">
-          <ShieldCheck className="w-10 h-10" />
+        <div className="w-24 h-24 bg-white rounded-3xl shadow-[20px_20px_60px_#c5c5c5,-20px_-20px_60px_#ffffff] flex items-center justify-center mb-8 p-4">
+          <img src={logo} alt="Baynunah" className="w-full h-full object-contain invert opacity-90" />
         </div>
 
         <h1 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Baynunah Pass</h1>
