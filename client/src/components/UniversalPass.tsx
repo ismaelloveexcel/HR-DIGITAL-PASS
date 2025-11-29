@@ -25,6 +25,13 @@ interface UniversalPassProps {
 
 export default function UniversalPass({ user }: UniversalPassProps) {
   const [expanded, setExpanded] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Reset expansion when user changes
   useEffect(() => {
@@ -42,61 +49,106 @@ export default function UniversalPass({ user }: UniversalPassProps) {
     }
   };
 
+  const getRoleGradient = (role: string) => {
+    switch(role) {
+      case 'candidate': return 'from-blue-500/20 to-blue-600/5';
+      case 'manager': return 'from-purple-500/20 to-purple-600/5';
+      case 'onboarding': return 'from-emerald-500/20 to-emerald-600/5';
+      default: return 'from-gray-500/20 to-gray-600/5';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-subtle flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute top-[-20%] right-[-10%] w-[300px] h-[300px] bg-blue-100/50 rounded-full blur-[80px]" />
-      <div className="absolute bottom-[-20%] left-[-10%] w-[300px] h-[300px] bg-emerald-100/50 rounded-full blur-[80px]" />
+      <div className="absolute top-[-20%] right-[-10%] w-[300px] h-[300px] bg-blue-100/50 rounded-full blur-[80px] animate-pulse-slow" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[300px] h-[300px] bg-emerald-100/50 rounded-full blur-[80px] animate-pulse-slow delay-1000" />
+
+      {/* Live Time Indicator */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="absolute top-6 right-6 text-right z-10"
+      >
+        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Local Time</p>
+        <p className="text-sm font-mono text-slate-900">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {!expanded ? (
           <motion.div 
             key="compact"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              rotateX: isHovering ? 5 : 0,
+              rotateY: isHovering ? 5 : 0,
+            }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="w-full max-w-md relative z-10"
+            className="w-full max-w-md relative z-10 perspective-1000"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           >
-            <div className="glass-panel rounded-3xl p-8 shadow-xl border border-white/60 backdrop-blur-xl">
-              <div className="flex flex-col items-center text-center space-y-6">
+            <div className="glass-panel rounded-3xl p-8 shadow-2xl border border-white/60 backdrop-blur-xl relative overflow-hidden group">
+              {/* Premium Texture Overlay */}
+              <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/noise-lines.png')] pointer-events-none" />
+              
+              {/* Security Strip Animation */}
+              <div className={cn("absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r", getRoleGradient(user.role))} />
+              <div className="absolute top-0 left-0 w-full h-1.5 overflow-hidden">
+                 <div className="w-full h-full bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+              </div>
+
+              <div className="flex flex-col items-center text-center space-y-8 relative z-10">
                 {/* QR Code (Primary) */}
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg ring-4 ring-white bg-white flex items-center justify-center">
-                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={80} fgColor="#1E40AF" />
+                  <div className="absolute -inset-4 bg-gradient-to-tr from-white/0 via-white/40 to-white/0 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] ring-1 ring-black/5 bg-white flex items-center justify-center relative z-10 transform transition-transform duration-500 group-hover:scale-105">
+                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
+                    {/* Baynunah Logo Centerpiece */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                       <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+                         <ShieldCheck className="w-4 h-4 text-[#1E40AF]" />
+                       </div>
+                    </div>
                   </div>
-                  <div className={cn("absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-medium border shadow-sm whitespace-nowrap uppercase tracking-wider", getRoleColor(user.role))}>
-                    {user.role}
+                  
+                  {/* Live Status Pill */}
+                  <div className={cn(
+                    "absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold border shadow-lg whitespace-nowrap uppercase tracking-widest flex items-center gap-1.5 backdrop-blur-md", 
+                    getRoleColor(user.role)
+                  )}>
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-current"></span>
+                    </span>
+                    {user.status === 'Active' ? 'Verified Live' : user.status}
                   </div>
                 </div>
 
                 {/* Identity */}
-                <div className="space-y-1 mt-4">
-                  <h1 className="text-2xl font-bold text-slate-900">{user.name}</h1>
-                  <p className="text-slate-500 font-medium">{user.title}</p>
+                <div className="space-y-2 mt-6">
+                  <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{user.name}</h1>
+                  <p className="text-slate-500 font-medium text-sm uppercase tracking-wide">{user.title}</p>
                   {user.department && (
-                    <div className="flex items-center justify-center gap-1.5 text-slate-400 text-sm mt-2">
-                      <Briefcase className="w-3.5 h-3.5" />
+                    <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs font-medium mt-3 bg-slate-50 py-1 px-3 rounded-lg mx-auto w-fit">
+                      <Briefcase className="w-3 h-3" />
                       <span>{user.department}</span>
                     </div>
                   )}
                 </div>
 
-                {/* Photo ID */}
-                <div className="hidden">
-                  <div className="w-40 h-40 rounded-xl overflow-hidden">
-                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-                  </div>
-                </div>
-                <p className="text-xs text-slate-400 font-mono tracking-widest">{user.code}</p>
-
                 {/* Action Button */}
                 <button 
                   onClick={toggleExpand}
-                  className="w-full py-4 bg-[#1E40AF] text-white rounded-xl font-semibold shadow-lg shadow-blue-900/20 hover:bg-blue-800 hover:shadow-blue-900/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
+                  className="w-full py-4 bg-[#1E40AF] text-white rounded-2xl font-semibold shadow-lg shadow-blue-900/20 hover:bg-blue-800 hover:shadow-blue-900/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group overflow-hidden relative"
                 >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                   <ShieldCheck className="w-5 h-5" />
-                  <span>Access Pass Dashboard</span>
+                  <span>Access Dashboard</span>
                   <ChevronUp className="w-4 h-4 opacity-60 group-hover:-translate-y-0.5 transition-transform" />
                 </button>
               </div>
