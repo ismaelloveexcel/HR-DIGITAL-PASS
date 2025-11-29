@@ -223,17 +223,41 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   )}
                 </div>
 
-                {/* Action Button - Reveal on Hover */}
+                {/* Recruitment Stage Indicator - Reveal on Hover */}
                 <motion.div 
-                  className="w-full overflow-hidden h-0 group-hover:h-[60px] transition-all duration-300 ease-in-out flex items-center justify-center"
+                  className="w-full overflow-hidden h-0 group-hover:h-auto min-h-0 group-hover:min-h-[80px] transition-all duration-500 ease-in-out flex flex-col items-center justify-center pt-2"
                 >
-                  <button 
-                    onClick={toggleExpand}
-                    className="w-full py-3.5 bg-[#1E40AF] text-white rounded-xl font-medium text-sm tracking-wide shadow-lg shadow-blue-900/10 hover:bg-blue-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                  >
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>Open Pass</span>
-                  </button>
+                  <div className="w-full bg-slate-50 rounded-xl p-3 border border-slate-100 shadow-inner">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recruitment Stage</span>
+                      <span className="text-[10px] font-bold text-[#1E40AF] uppercase tracking-wider">Interview</span>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="flex gap-1 h-1.5 mb-2">
+                      {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
+                        const currentStageIndex = 3; // Interview is index 3 (0-based)
+                        const isActive = i === currentStageIndex;
+                        const isCompleted = i < currentStageIndex;
+                        
+                        return (
+                          <div 
+                            key={stage} 
+                            className={cn(
+                              "h-full rounded-full flex-1 transition-colors duration-300",
+                              isActive ? "bg-[#1E40AF]" : 
+                              isCompleted ? "bg-emerald-400" : 
+                              "bg-slate-200"
+                            )} 
+                          />
+                        );
+                      })}
+                    </div>
+                    
+                    <p className="text-[9px] text-slate-400 text-center leading-tight">
+                      You are currently in the <span className="font-bold text-slate-600">Interview</span> stage.
+                    </p>
+                  </div>
                 </motion.div>
                 
                 {/* Bottom indicator when not hovering */}
