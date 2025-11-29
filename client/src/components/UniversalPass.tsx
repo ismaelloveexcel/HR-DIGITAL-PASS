@@ -83,7 +83,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 </div>
 
                 {/* Photo ID */}
-                <div className="p-2 bg-white rounded-2xl shadow-inner border border-slate-100">
+                <div className="hidden">
                   <div className="w-40 h-40 rounded-xl overflow-hidden">
                     <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                   </div>
