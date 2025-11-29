@@ -96,14 +96,14 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
               <div className="flex flex-col items-center text-center space-y-8 relative z-10 mt-2">
                 {/* QR Code (Primary) */}
-                <div className="relative">
+                <div className="relative flex flex-col items-center">
                   <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm">
                     <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
                   </div>
                   
                   {/* Status Dot */}
                   <div className={cn(
-                    "absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-medium border border-slate-100 shadow-sm whitespace-nowrap uppercase tracking-wider flex items-center gap-1.5 bg-white/80 backdrop-blur-sm text-slate-500"
+                    "mt-3 px-3 py-1 rounded-full text-[10px] font-medium border border-slate-100 shadow-sm whitespace-nowrap uppercase tracking-wider flex items-center gap-1.5 bg-white/80 backdrop-blur-sm text-slate-500"
                   )}>
                     <span className={cn("w-1.5 h-1.5 rounded-full", user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
                     {user.status}
