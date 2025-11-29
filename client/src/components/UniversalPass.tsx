@@ -111,7 +111,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                    {/* Code Box */}
                    <div className="w-full rounded-xl p-3 flex items-center justify-center relative mb-4 border border-white/10 text-[#193cb8] font-semibold text-[18px] bg-[#e8eafa] shrink-0">
-                      <span className="font-mono text-sm tracking-widest opacity-90 text-[#85848a] bg-[#00000000]">N8EC-PS5D-9PKD</span>
+                      <span className="font-mono tracking-widest opacity-90 text-[#85848a] bg-[#00000000] text-[16px]">N8EC-PS5D-9PKD</span>
                       <button className="absolute right-4 opacity-60 hover:opacity-100">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
