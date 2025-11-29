@@ -99,7 +99,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 </button>
 
                 <div className="flex flex-col items-center text-center pt-2 pb-2">
-                   <h2 className="text-lg font-bold mb-1 bg-[#08004f00] text-[#193cb8] shrink-0">Verification Code</h2>
+                   <h2 className="text-lg mb-1 bg-[#08004f00] text-[#193cb8] shrink-0 font-medium">Verification Code</h2>
                    <p className="mb-4 shrink-0 text-[#85848a] text-[14px]">Scan the QR code or enter manually</p>
 
                    {/* Large QR Card */}
