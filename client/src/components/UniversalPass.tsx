@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { UserData } from '@/lib/mockData';
 import { cn } from '@/lib/utils';
+import logo from '@assets/baynunah-logo_1764408063481.png';
 
 interface UniversalPassProps {
   user: UserData;
@@ -157,6 +158,11 @@ export default function UniversalPass({ user }: UniversalPassProps) {
               <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50", getRoleGradient(user.role))} />
 
               <div className="flex flex-col items-center text-center space-y-8 relative z-10 mt-2">
+                {/* Logo */}
+                <div className="h-12 mb-[-1rem] flex items-center justify-center">
+                  <img src={logo} alt="Baynunah" className="h-full object-contain invert opacity-90" />
+                </div>
+
                 {/* QR Code (Primary) */}
                 <div className="relative flex flex-col items-center group cursor-pointer" onClick={() => setShowVerification(true)}>
                   <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm group-hover:scale-105 transition-transform duration-300">
