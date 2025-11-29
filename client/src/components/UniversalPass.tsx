@@ -161,11 +161,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 <div className="relative flex flex-col items-center group cursor-pointer" onClick={() => setShowVerification(true)}>
                   <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm group-hover:scale-105 transition-transform duration-300">
                     <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
-                    
-                    {/* Tap Hint Overlay */}
-                    <div className="absolute inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-[10px] font-bold text-slate-800 bg-white/90 px-2 py-1 rounded-full shadow-sm">TAP TO VERIFY</span>
-                    </div>
                   </div>
                   
                   {/* Status Dot */}
