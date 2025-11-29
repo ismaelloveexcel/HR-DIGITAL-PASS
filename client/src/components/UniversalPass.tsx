@@ -179,8 +179,22 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                 {/* QR Code (Primary) */}
                 <div className="relative flex flex-col items-center group cursor-pointer mb-6" onClick={() => setShowVerification(true)}>
-                  <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm group-hover:scale-105 transition-transform duration-300">
-                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
+                  <div className="w-40 h-40 relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    {/* Corner Brackets */}
+                    <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-slate-100 rounded-tl-xl" />
+                    <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-slate-100 rounded-tr-xl" />
+                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-slate-100 rounded-bl-xl" />
+                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-slate-100 rounded-br-xl" />
+                    
+                    {/* 3D Embossed QR */}
+                    <div className="filter drop-shadow-[4px_4px_6px_rgba(0,0,0,0.1)]">
+                      <QRCodeSVG 
+                        value={`https://baynunah-pass.com/pass/${user.code}`} 
+                        size={120} 
+                        fgColor="#FFFFFF" 
+                        bgColor="transparent"
+                      />
+                    </div>
                   </div>
                   
                   {/* Status Dot */}
