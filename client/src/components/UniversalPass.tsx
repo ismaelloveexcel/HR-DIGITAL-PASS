@@ -98,42 +98,42 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   <span className="text-xl font-light">&times;</span>
                 </button>
 
-                <div className="flex flex-col items-center text-center pt-2 pb-2">
-                   <h2 className="text-lg mb-1 bg-[#08004f00] text-[#193cb8] shrink-0 font-medium">Verification Code</h2>
-                   <p className="mb-4 shrink-0 text-[#85848a] text-[14px]">Scan the QR code or enter manually</p>
+                <div className="flex flex-col items-center text-center pt-4 pb-4">
+                   <h2 className="text-2xl font-bold tracking-tight mb-1 text-[#1E40AF] shrink-0">Verification Code</h2>
+                   <p className="mb-6 shrink-0 text-slate-500 text-sm font-medium">Scan the QR code or enter manually</p>
 
                    {/* Large QR Card */}
-                   <div className="bg-white p-3 rounded-3xl w-48 aspect-square flex items-center justify-center mb-4 shadow-lg shrink-0">
-                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={160} fgColor="#000000" />
+                   <div className="bg-white p-4 rounded-3xl w-52 aspect-square flex items-center justify-center mb-6 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50">
+                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={180} fgColor="#1e293b" />
                    </div>
 
-                   <p className="text-white/40 text-[10px] uppercase tracking-widest mb-2 shrink-0">OR enter the code manually</p>
+                   <p className="text-slate-400 text-[11px] uppercase tracking-[0.2em] font-bold mb-3 shrink-0">OR enter the code manually</p>
 
                    {/* Code Box */}
-                   <div className="w-full rounded-xl p-3 flex items-center justify-center relative mb-4 border border-white/10 text-[#193cb8] font-semibold text-[18px] bg-[#e8eafa] shrink-0">
-                      <span className="font-mono tracking-widest opacity-90 text-[#85848a] bg-[#00000000] text-[16px]">N8EC-PS5D-9PKD</span>
-                      <button className="absolute right-4 opacity-60 hover:opacity-100">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                   <div className="w-full rounded-2xl p-4 flex items-center justify-center relative mb-6 border border-slate-100 text-slate-700 bg-slate-50/80 shrink-0 shadow-inner">
+                      <span className="font-mono tracking-[0.2em] text-xl font-bold">N8EC-PS5D-9PKD</span>
+                      <button className="absolute right-4 text-slate-400 hover:text-[#1E40AF] transition-colors">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
                    </div>
 
                    {/* User Info */}
-                   <div className="mb-4 shrink-0">
-                      <h3 className="text-[#193cb8] text-[20px] font-normal">{user.name}</h3>
-                      <p className="text-[#6b6b80] font-normal text-[20px]">{user.code}</p>
+                   <div className="mb-6 shrink-0 space-y-0.5">
+                      <h3 className="text-[#1E40AF] text-xl font-bold tracking-tight">{user.name}</h3>
+                      <p className="text-slate-500 font-mono text-xs tracking-wider">{user.code}</p>
                    </div>
 
-                   <div className="w-full h-px bg-white/10 mb-4 shrink-0" />
+                   <div className="w-full h-px bg-slate-100 mb-5 shrink-0" />
 
                    <button 
                      onClick={() => {
                        setShowVerification(false);
                        setExpanded(true);
                      }}
-                     className="w-full py-3.5 rounded-xl hover:bg-white/20 border border-white/10 transition-all flex items-center justify-center gap-2 text-sm bg-[#e8eafa] text-[#9c9c9c] font-semibold shrink-0"
+                     className="w-full py-4 rounded-2xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center gap-2 text-sm bg-slate-50 text-slate-600 hover:text-[#1E40AF] font-semibold shrink-0 group"
                    >
-                     <span className="text-[#85848a] text-[16px]">View Full Profile</span>
-                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                     <span className="group-hover:translate-x-[-2px] transition-transform">View Full Profile</span>
+                     <svg className="group-hover:translate-x-[2px] transition-transform" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                    </button>
                 </div>
              </div>
