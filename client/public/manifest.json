@@ -1,0 +1,21 @@
+{
+  "name": "Baynunah HR Pass",
+  "short_name": "Baynunah HR",
+  "description": "Premium HR digital pass system for Baynunah",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1E40AF",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
