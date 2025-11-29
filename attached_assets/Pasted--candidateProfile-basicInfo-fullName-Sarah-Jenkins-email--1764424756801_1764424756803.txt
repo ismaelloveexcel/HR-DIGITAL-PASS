@@ -1,0 +1,260 @@
+{
+  "candidateProfile": {
+    "basicInfo": {
+      "fullName": "Sarah Jenkins",
+      "email": "sarah.jenkins@example.com",
+      "phone": "+971 50 123 4567",
+      "currentLocation": "Dubai, UAE",
+      "nationality": "British",
+      "gender": "Female",
+      "visaStatus": "Employment Visa (Transferable)",
+      "willingToRelocateAbudhabi": "Yes",
+      "noticePeriod": "30 Days",
+      "dateOfBirth": "1990-05-15",  // Added for age-related compliance or diversity tracking
+      "languages": ["English", "Arabic"],  // Added multilingual support, common in global portals like EMPTrust
+      "linkedInProfile": "https://www.linkedin.com/in/sarahjenkins",  // Added social profiles for screening, as in BambooHR/LinkedIn integrations
+      "otherSocialLinks": {
+        "github": "https://github.com/sarahjenkins",
+        "portfolio": "https://sarahjenkins.design"
+      }  // Enhanced with portfolio for creative roles, per candidate screening best practices
+    },
+    "positionInfo": {
+      "positionApplied": "Senior UX Designer",
+      "appliedDate": "2024-11-15",
+      "currentStage": "Final Interview",
+      "candidateId": "C-2024-889",
+      "positionId": "UX-SENIOR-24",
+      "positionRef": "REF-2025-01",
+      "source": "LinkedIn Referral",  // Added sourcing info for analytics, key in ATS like Greenhouse
+      "timeInPipeline": "11 days"  // Added metric for tracking efficiency, from recruitment software features
+    },
+    "compensation": {
+      "salaryExpectation": 25000,
+      "currency": "AED",
+      "benefitsPreferences": ["Health Insurance", "Remote Work Options", "Professional Development Budget"]  // Added preferences for better matching, inspired by ideal candidate profiles
+    },
+    "experience": {
+      "totalYearsExperience": 8,
+      "currentOrLastJobTitle": "Lead Product Designer",
+      "currentOrLastCompany": "TechFlow Solutions",
+      "industryBackground": ["Fintech", "E-commerce", "SaaS"],
+      "workHistory": [  // Added detailed history for comprehensive screening
+        {
+          "jobTitle": "Lead Product Designer",
+          "company": "TechFlow Solutions",
+          "startDate": "2020-01-01",
+          "endDate": "Present",
+          "description": "Led design teams on fintech projects."
+        },
+        {
+          "jobTitle": "UX Designer",
+          "company": "DesignHub",
+          "startDate": "2016-06-01",
+          "endDate": "2019-12-31",
+          "description": "Developed user interfaces for e-commerce platforms."
+        }
+      ],
+      "certifications": [  // Added for skills validation, common in onboarding software
+        {
+          "name": "Certified UX Professional",
+          "issuer": "Nielsen Norman Group",
+          "issueDate": "2022-03-15",
+          "expiryDate": "2025-03-15"
+        }
+      ]
+    },
+    "skills": {
+      "technicalSkills": ["Figma", "Protopie", "React Basics", "User Research", "Design Systems"],
+      "transferableSkills": ["Team Leadership", "Stakeholder Management", "Agile Methodology"],
+      "skillProficiency": {  // Added proficiency levels for better evaluation, per AI-driven features in Lever
+        "Figma": "Expert",
+        "User Research": "Advanced"
+      },
+      "endorsements": [  // Added for social proof, like LinkedIn features
+        {
+          "skill": "Figma",
+          "endorser": "John Doe",
+          "date": "2024-10-01"
+        }
+      ]
+    },
+    "education": {
+      "highestDegree": "Master of Design",
+      "major": "Interaction Design",
+      "university": "Royal College of Art",
+      "graduationYear": "2016",
+      "educationHistory": [  // Expanded for full academic background
+        {
+          "degree": "Master of Design",
+          "major": "Interaction Design",
+          "university": "Royal College of Art",
+          "graduationYear": "2016",
+          "gpa": "3.8/4.0"
+        },
+        {
+          "degree": "Bachelor of Arts in Graphic Design",
+          "major": "Graphic Design",
+          "university": "University of London",
+          "graduationYear": "2014"
+        }
+      ]
+    },
+    "evaluation": {
+      "matchScore": 88,
+      "matchScoreBreakdown": {
+        "profile_fit": 85,
+        "soft_skills": 92,
+        "technical": 78,
+        "interview": 88,
+        "diversity_fit": 90  // Added diversity metric for inclusive hiring, a 2025 trend
+      },
+      "behaviouralScorePercent": 85,
+      "behaviouralTraits": {
+        "ownership": 4,
+        "accuracy": 5,
+        "calm_under_pressure": 4,
+        "teamwork": 5,
+        "communication": 5
+      },
+      "strengthTags": ["Collaborative", "Detail-oriented", "Strategic Thinker"],
+      "concernTags": [],
+      "recommendedAction": "Hire",
+      "summaryNotes": "Sarah is an exceptional candidate with strong leadership potential. Her technical skills are top-tier, and she demonstrates excellent cultural alignment.",
+      "interviewFeedback": [  // Added for manager input during evaluations
+        {
+          "round": "Technical Interview",
+          "interviewer": "Alex Smith",
+          "score": 85,
+          "notes": "Strong in design systems, but could improve on React integration.",
+          "date": "2024-11-20"
+        }
+      ],
+      "aiInsights": {  // Added AI-driven suggestions, a key 2025 trend from Greenhouse/EMPTrust
+        "strengthsSummary": "AI-generated: High alignment with team dynamics based on behavioral data.",
+        "improvementAreas": "Consider additional training in advanced prototyping tools."
+      }
+    },
+    "nextActions": [
+      {
+        "id": 1,
+        "type": "interview",
+        "label": "Schedule Final Interview",
+        "status": "pending",
+        "due": "Tomorrow",
+        "assignedTo": "Hiring Manager"  // Added assignment for task management
+      },
+      {
+        "id": 2,
+        "type": "assessment",
+        "label": "Review Portfolio Deep-dive",
+        "status": "pending",
+        "due": "Tomorrow"
+      },
+      {
+        "id": 3,
+        "type": "admin",
+        "label": "Check References",
+        "status": "completed"
+      }
+    ],
+    "onboarding": {  // New section for post-hire, based on onboarding trends like personalized journeys and compliance
+      "status": "Not Started",  // E.g., Pending, In Progress, Completed
+      "tasks": [
+        {
+          "label": "Sign Employment Contract",
+          "status": "pending",
+          "due": "2024-12-01"
+        },
+        {
+          "label": "Complete Compliance Training",
+          "status": "pending",
+          "due": "2024-12-05"
+        }
+      ],
+      "documents": [  // For document storage and e-signatures
+        {
+          "name": "Offer Letter",
+          "url": "https://storage.example.com/offer-letter.pdf",
+          "signed": false
+        }
+      ],
+      "engagementMetrics": {  // Added metrics for onboarding success, per 2025 stats (e.g., retention boost)
+        "completionRate": 0,
+        "satisfactionScore": null
+      }
+    },
+    "attachments": [  // New section for uploads, essential in ATS
+      {
+        "type": "resume",
+        "url": "https://storage.example.com/resume.pdf",
+        "uploadedDate": "2024-11-15"
+      },
+      {
+        "type": "coverLetter",
+        "url": "https://storage.example.com/cover-letter.pdf",
+        "uploadedDate": "2024-11-15"
+      }
+    ],
+    "references": [  // Added for reference checks
+      {
+        "name": "Jane Doe",
+        "relationship": "Former Manager",
+        "contact": "jane.doe@example.com",
+        "verified": false
+      }
+    ],
+    "metrics": {  // New top-level section for analytics, inspired by Greenhouse reporting and 2025 data trends
+      "applicationViews": 15,  // How many times profile viewed
+      "timeToHire": "Projected: 20 days",  // Key recruitment metric
+      "retentionProbability": 82,  // Based on onboarding stats (82% boost from effective processes)
+      "diversityScore": 85,  // For DEI tracking
+      "engagementScore": 90  // Candidate interaction metric
+    },
+    "collaboration": {  // New for team input, like panel interviews in iCIMS
+      "notes": [
+        {
+          "author": "HR Admin",
+          "content": "Candidate showed strong enthusiasm in initial screening.",
+          "date": "2024-11-16"
+        }
+      ],
+      "sharedWith": ["Hiring Manager", "Team Lead"]  // Access control
+    },
+    "candidateEditableFields": [
+      "email",
+      "phone",
+      "currentLocation",
+      "visaStatus",
+      "willingToRelocateAbudhabi",
+      "noticePeriod",
+      "salaryExpectation",
+      "technicalSkills",
+      "transferableSkills",
+      "highestDegree",
+      "major",
+      "university",
+      "graduationYear",
+      "languages",  // Added
+      "linkedInProfile",  // Added
+      "otherSocialLinks",  // Added
+      "workHistory",  // Partial edits
+      "certifications",  // Added
+      "references"  // Added for self-provided
+    ],
+    "metadata": {
+      "lastUpdatedBy": "candidate",
+      "lastUpdatedDate": "2025-11-26",
+      "source": "CV + Candidate Input",
+      "missingFields": ["portfolioLink", "linkedInProfile"],  // Updated
+      "completionPercentage": 85,  // Added progress metric for profile filling
+      "version": 3  // For tracking changes
+    }
+  }
+}
+
+
+
+
+
+
+	

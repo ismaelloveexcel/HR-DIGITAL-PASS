@@ -20,6 +20,8 @@ import { UserData } from '@/lib/mockData';
 import { cn } from '@/lib/utils';
 import logo from '@assets/baynunah-logo_1764408063481.png';
 
+import { useLocation } from 'wouter';
+
 interface UniversalPassProps {
   user: UserData;
 }
@@ -29,6 +31,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isHovering, setIsHovering] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -103,7 +106,10 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                    <p className="mb-6 shrink-0 text-slate-500 text-sm font-medium">Scan the QR code or enter manually</p>
 
                    {/* Large QR Card */}
-                   <div className="bg-white p-4 rounded-3xl w-52 aspect-square flex items-center justify-center mb-6 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50">
+                   <div 
+                    className="bg-white p-4 rounded-3xl w-52 aspect-square flex items-center justify-center mb-6 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50 cursor-pointer hover:scale-105 transition-transform"
+                    onClick={() => setLocation('/candidate-profile')}
+                   >
                       <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={180} fgColor="#1e293b" />
                    </div>
 
@@ -128,7 +134,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                    <button 
                      onClick={() => {
                        setShowVerification(false);
-                       setExpanded(true);
+                       setLocation('/candidate-profile');
                      }}
                      className="w-full py-4 rounded-2xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center gap-2 text-sm bg-slate-50 text-slate-600 hover:text-[#1E40AF] font-semibold shrink-0 group"
                    >

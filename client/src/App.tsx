@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/landing";
 import PassPage from "@/pages/pass";
+import CandidateProfile from "@/pages/candidate-profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -12,6 +13,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/pass/:code" component={PassPage} />
+      <Route path="/candidate-profile" component={CandidateProfile} />
       <Route component={NotFound} />
     </Switch>
   );
