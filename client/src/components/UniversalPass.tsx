@@ -59,19 +59,16 @@ export default function UniversalPass({ user }: UniversalPassProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#e0e0e0] flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500">
-      {/* Background Elements - Subtle Neumorphic Shapes */}
-      <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-[#e0e0e0] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] blur-[2px] opacity-60" />
-      <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-[#e0e0e0] shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] blur-[2px] opacity-60" />
-
-      {/* Live Time Indicator */}
+    <div className="min-h-screen bg-[#e8e8e8] flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 font-sans">
+      
+      {/* Live Time Indicator - minimalist */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute top-6 right-6 text-right z-10"
+        className="absolute top-8 right-8 text-right z-10"
       >
-        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Local Time</p>
-        <p className="text-sm font-mono text-slate-800">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Local Time</p>
+        <p className="text-sm font-mono text-slate-600">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
 
       <AnimatePresence mode="wait">
@@ -83,88 +80,54 @@ export default function UniversalPass({ user }: UniversalPassProps) {
               opacity: 1, 
               y: 0, 
               scale: 1,
-              rotateX: isHovering ? 5 : 0,
-              rotateY: isHovering ? 5 : 0,
             }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="w-full max-w-md relative z-10 perspective-1000"
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
+            className="w-full max-w-[320px] relative z-10"
           >
             <div 
-              className="rounded-[50px] p-8 relative overflow-hidden group bg-[#e0e0e0] transition-all duration-300"
+              className="bg-[#e8e8e8] rounded-[40px] p-8 relative group transition-all duration-300"
               style={{
-                boxShadow: '20px 20px 60px #bebebe, -20px -20px 60px #ffffff'
+                boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
               }}
             >
-              {/* Premium Texture Overlay */}
-              <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/noise-lines.png')] pointer-events-none" />
-              
-              {/* Security Strip Animation */}
-              <div className={cn("absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r", getRoleGradient(user.role))} />
-              <div className="absolute top-0 left-0 w-full h-1.5 overflow-hidden">
-                 <div className="w-full h-full bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-              </div>
+              {/* Security Strip - Minimal */}
+              <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50", getRoleGradient(user.role))} />
 
-              <div className="flex flex-col items-center text-center space-y-8 relative z-10">
+              <div className="flex flex-col items-center text-center space-y-8 relative z-10 mt-2">
                 {/* QR Code (Primary) */}
                 <div className="relative">
-                  {/* Neumorphic QR Container */}
-                  <div 
-                    className="w-32 h-32 rounded-3xl overflow-hidden flex items-center justify-center relative z-10 transform transition-transform duration-500 group-hover:scale-105 bg-[#e0e0e0]"
-                    style={{
-                      boxShadow: '5px 5px 10px #bebebe, -5px -5px 10px #ffffff'
-                    }}
-                  >
-                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" bgColor="#e0e0e0" />
-                    {/* Baynunah Logo Centerpiece */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                       <div className="w-8 h-8 bg-[#e0e0e0] rounded-full flex items-center justify-center shadow-[2px_2px_5px_#bebebe,-2px_-2px_5px_#ffffff]">
-                         <ShieldCheck className="w-4 h-4 text-[#1E40AF]" />
-                       </div>
-                    </div>
+                  <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm">
+                    <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
                   </div>
                   
-                  {/* Live Status Pill */}
+                  {/* Status Dot */}
                   <div className={cn(
-                    "absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold border shadow-sm whitespace-nowrap uppercase tracking-widest flex items-center gap-1.5", 
-                    getRoleColor(user.role)
+                    "absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-medium border border-slate-100 shadow-sm whitespace-nowrap uppercase tracking-wider flex items-center gap-1.5 bg-white/80 backdrop-blur-sm text-slate-500"
                   )}>
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-current"></span>
-                    </span>
-                    {user.status === 'Active' ? 'Verified Live' : user.status}
+                    <span className={cn("w-1.5 h-1.5 rounded-full", user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
+                    {user.status}
                   </div>
                 </div>
 
                 {/* Identity */}
-                <div className="space-y-2 mt-6">
-                  <h1 className="text-3xl font-bold text-slate-800 tracking-tight">{user.name}</h1>
-                  <p className="text-slate-500 font-medium text-sm uppercase tracking-wide">{user.title}</p>
+                <div className="space-y-1 mt-6">
+                  <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{user.name}</h1>
+                  <p className="text-slate-500 font-medium text-xs uppercase tracking-wider">{user.title}</p>
                   {user.department && (
-                    <div 
-                      className="flex items-center justify-center gap-1.5 text-slate-500 text-xs font-medium mt-3 py-1 px-3 rounded-lg mx-auto w-fit bg-[#e0e0e0]"
-                      style={{ boxShadow: 'inset 2px 2px 5px #bebebe, inset -2px -2px 5px #ffffff' }}
-                    >
-                      <Briefcase className="w-3 h-3" />
-                      <span>{user.department}</span>
-                    </div>
+                    <p className="text-slate-400 text-[10px] font-medium mt-1">
+                      {user.department}
+                    </p>
                   )}
                 </div>
 
-                {/* Action Button - Neumorphic */}
+                {/* Action Button - Clean & Flat */}
                 <button 
                   onClick={toggleExpand}
-                  className="w-full py-4 text-[#1E40AF] rounded-2xl font-bold tracking-wide transition-all active:scale-[0.98] flex items-center justify-center gap-2 group overflow-hidden relative bg-[#e0e0e0]"
-                  style={{
-                    boxShadow: '8px 8px 16px #bebebe, -8px -8px 16px #ffffff'
-                  }}
+                  className="w-full py-3.5 bg-[#1E40AF] text-white rounded-xl font-medium text-sm tracking-wide shadow-lg shadow-blue-900/10 hover:bg-blue-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
                 >
-                  <ShieldCheck className="w-5 h-5" />
-                  <span>Access Dashboard</span>
-                  <ChevronUp className="w-4 h-4 opacity-60 group-hover:-translate-y-0.5 transition-transform" />
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Open Pass</span>
                 </button>
               </div>
             </div>
