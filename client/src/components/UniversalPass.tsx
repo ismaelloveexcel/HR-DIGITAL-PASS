@@ -27,6 +27,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
   const [expanded, setExpanded] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isHovering, setIsHovering] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -70,6 +71,69 @@ export default function UniversalPass({ user }: UniversalPassProps) {
         <p className="text-sm font-mono text-slate-600">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
       <AnimatePresence mode="wait">
+        {showVerification && (
+          <motion.div
+            key="verification"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+             <div className="bg-[#2C41AC] w-full max-w-sm rounded-[32px] p-6 text-white relative overflow-hidden shadow-2xl">
+                {/* Close Button */}
+                <button 
+                  onClick={() => setShowVerification(false)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                >
+                  <span className="text-xl font-light">&times;</span>
+                </button>
+
+                <div className="flex flex-col items-center text-center pt-4 pb-2">
+                   {/* Icon */}
+                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4 ring-1 ring-white/20">
+                     <span className="text-2xl font-light">#</span>
+                   </div>
+
+                   <h2 className="text-lg font-bold mb-1">Verification Code</h2>
+                   <p className="text-white/60 text-xs mb-8">Scan the QR code or enter manually</p>
+
+                   {/* Large QR Card */}
+                   <div className="bg-white p-4 rounded-3xl w-full aspect-square flex items-center justify-center mb-6 shadow-lg">
+                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={200} fgColor="#000000" />
+                   </div>
+
+                   <p className="text-white/40 text-[10px] uppercase tracking-widest mb-3">OR enter the code manually</p>
+
+                   {/* Code Box */}
+                   <div className="w-full bg-white/10 rounded-xl p-4 flex items-center justify-between mb-8 border border-white/10">
+                      <span className="font-mono text-sm tracking-widest opacity-90">N8EC-PS5D-9PKD</span>
+                      <button className="opacity-60 hover:opacity-100">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                      </button>
+                   </div>
+
+                   {/* User Info */}
+                   <div className="mb-8">
+                      <h3 className="font-bold text-lg">{user.name}</h3>
+                      <p className="text-white/60 text-sm">{user.code}</p>
+                   </div>
+
+                   <div className="w-full h-px bg-white/10 mb-6" />
+
+                   <button 
+                     onClick={() => {
+                       setShowVerification(false);
+                       setExpanded(true);
+                     }}
+                     className="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                   >
+                     <span>View Full Profile</span>
+                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                   </button>
+                </div>
+             </div>
+          </motion.div>
+        )}
         {!expanded ? (
           <motion.div 
             key="compact"
@@ -94,9 +158,14 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
               <div className="flex flex-col items-center text-center space-y-8 relative z-10 mt-2">
                 {/* QR Code (Primary) */}
-                <div className="relative flex flex-col items-center">
-                  <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm">
+                <div className="relative flex flex-col items-center group cursor-pointer" onClick={() => setShowVerification(true)}>
+                  <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center relative z-10 bg-white shadow-sm group-hover:scale-105 transition-transform duration-300">
                     <QRCodeSVG value={`https://baynunah-pass.com/pass/${user.code}`} size={100} fgColor="#1E40AF" />
+                    
+                    {/* Tap Hint Overlay */}
+                    <div className="absolute inset-0 bg-black/5 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="text-[10px] font-bold text-slate-800 bg-white/90 px-2 py-1 rounded-full shadow-sm">TAP TO VERIFY</span>
+                    </div>
                   </div>
                   
                   {/* Status Dot */}
