@@ -179,7 +179,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                 {/* QR Code (Primary) */}
                 <div className="relative flex flex-col items-center group cursor-pointer mb-6" onClick={() => setShowVerification(true)}>
-                  <div className="w-40 h-40 relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-40 h-40 relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300 pt-[0px] pb-[0px] mt-[15px] mb-[15px]">
                     {/* Corner Brackets */}
                     <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-slate-100 rounded-tl-xl" />
                     <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-slate-100 rounded-tr-xl" />
