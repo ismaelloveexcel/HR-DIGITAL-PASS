@@ -223,37 +223,41 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                   )}
                 </div>
 
-                {/* Recruitment Stage Indicator - Static & Minimal */}
-                <div className="w-full mt-4 pt-4 border-t border-slate-100">
-                  <div className="flex justify-between items-end mb-2">
-                    <div className="flex flex-col text-left">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
-                      <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide">Interview</span>
+                {/* Recruitment Stage Indicator - Reveal on Hover */}
+                <motion.div 
+                  className="w-full overflow-hidden h-0 group-hover:h-auto transition-all duration-500 ease-in-out"
+                >
+                  <div className="w-full mt-2 pt-4 border-t border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                    <div className="flex justify-between items-end mb-2">
+                      <div className="flex flex-col text-left">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
+                        <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide">Interview</span>
+                      </div>
+                      <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
                     </div>
-                    <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
+                    
+                    {/* Simple Segmented Progress Bar */}
+                    <div className="flex gap-1 h-1.5 w-full">
+                      {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
+                        const currentStageIndex = 3; // Interview
+                        const isActive = i === currentStageIndex;
+                        const isCompleted = i < currentStageIndex;
+                        
+                        return (
+                          <div 
+                            key={stage} 
+                            className={cn(
+                              "h-full rounded-full flex-1 transition-colors",
+                              isActive ? "bg-[#1E40AF]" : 
+                              isCompleted ? "bg-emerald-400" : 
+                              "bg-slate-200"
+                            )} 
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
-                  
-                  {/* Simple Segmented Progress Bar */}
-                  <div className="flex gap-1 h-1.5 w-full">
-                    {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
-                      const currentStageIndex = 3; // Interview
-                      const isActive = i === currentStageIndex;
-                      const isCompleted = i < currentStageIndex;
-                      
-                      return (
-                        <div 
-                          key={stage} 
-                          className={cn(
-                            "h-full rounded-full flex-1 transition-colors",
-                            isActive ? "bg-[#1E40AF]" : 
-                            isCompleted ? "bg-emerald-400" : 
-                            "bg-slate-200"
-                          )} 
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
+                </motion.div>
                 
                 {/* Bottom indicator when not hovering */}
                 <div className="h-1 w-12 bg-slate-300 rounded-full mx-auto group-hover:w-0 group-hover:opacity-0 transition-all duration-300 mt-4" />
