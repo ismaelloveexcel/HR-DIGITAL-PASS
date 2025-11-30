@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { 
   ArrowLeft, 
@@ -16,7 +17,10 @@ import {
   TrendingUp,
   Users,
   Brain,
-  Download
+  Download,
+  Edit2,
+  X,
+  Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@assets/baynunah-logo_1764408063481.png';
@@ -132,10 +136,330 @@ const CANDIDATE_DATA = {
 
 export default function CandidateProfile() {
   const [, setLocation] = useLocation();
-  const data = CANDIDATE_DATA;
+  const [data, setData] = useState(CANDIDATE_DATA);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    phone: data.basicInfo.phone,
+    email: data.basicInfo.email,
+    emirate: "Dubai", // Default derived from location
+    currentCity: "Dubai",
+    visaStatus: data.basicInfo.visaStatus,
+    noticePeriod: data.basicInfo.noticePeriod,
+    readyToRelocateAbuDhabi: data.basicInfo.willingToRelocateAbudhabi,
+    expectedSalary: data.compensation.salaryExpectation,
+    salaryCurrency: data.compensation.currency,
+    languages: data.basicInfo.languages.join(", "),
+    portfolioLink: data.basicInfo.otherSocialLinks.portfolio,
+    linkedInProfile: data.basicInfo.linkedInProfile,
+    agreed: false
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: checked }));
+  };
+
+  const handleSave = () => {
+    // Update main data with form data
+    const updatedData = {
+        ...data,
+        basicInfo: {
+            ...data.basicInfo,
+            phone: formData.phone,
+            email: formData.email,
+            currentLocation: `${formData.currentCity}, ${formData.emirate}`,
+            visaStatus: formData.visaStatus,
+            noticePeriod: formData.noticePeriod,
+            willingToRelocateAbudhabi: formData.readyToRelocateAbuDhabi,
+            languages: formData.languages.split(",").map(l => l.trim()),
+            linkedInProfile: formData.linkedInProfile,
+            otherSocialLinks: {
+                ...data.basicInfo.otherSocialLinks,
+                portfolio: formData.portfolioLink
+            }
+        },
+        compensation: {
+            ...data.compensation,
+            salaryExpectation: Number(formData.expectedSalary),
+            currency: formData.salaryCurrency
+        }
+    };
+    
+    setData(updatedData);
+    setShowEditModal(false);
+  };
 
   return (
-    <div className="min-h-screen bg-subtle font-sans text-slate-900 pb-20">
+    <div className="min-h-screen bg-subtle font-sans text-slate-900 pb-20 relative">
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {showEditModal && (
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-sm"
+            >
+                <motion.div 
+                    initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                    className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+                >
+                    <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900">Edit Profile Details</h2>
+                            <p className="text-sm text-slate-500">Update your candidate information</p>
+                        </div>
+                        <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 overflow-y-auto space-y-8">
+                        {/* Contact Info */}
+                        <section className="space-y-4">
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <Mail className="w-4 h-4 text-[#1E40AF]" />
+                                Contact Information
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Phone Number</label>
+                                    <input 
+                                        type="text" 
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                    />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Location Info */}
+                        <section className="space-y-4">
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-[#1E40AF]" />
+                                Location Details
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Current Emirate</label>
+                                    <select 
+                                        name="emirate"
+                                        value={formData.emirate}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium appearance-none"
+                                    >
+                                        <option value="Abu Dhabi">Abu Dhabi</option>
+                                        <option value="Dubai">Dubai</option>
+                                        <option value="Sharjah">Sharjah</option>
+                                        <option value="Ajman">Ajman</option>
+                                        <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                                        <option value="Fujairah">Fujairah</option>
+                                        <option value="Umm Al Quwain">Umm Al Quwain</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Current City</label>
+                                    <input 
+                                        type="text" 
+                                        name="currentCity"
+                                        value={formData.currentCity}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                    />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Job Eligibility */}
+                        <section className="space-y-4">
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-[#1E40AF]" />
+                                Job Eligibility
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Visa Status</label>
+                                    <input 
+                                        type="text" 
+                                        name="visaStatus"
+                                        value={formData.visaStatus}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Notice Period</label>
+                                    <input 
+                                        type="text" 
+                                        name="noticePeriod"
+                                        value={formData.noticePeriod}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                    />
+                                </div>
+                                <div className="space-y-1.5 md:col-span-2">
+                                    <label className="text-xs font-medium text-slate-500">Willing to relocate to Abu Dhabi?</label>
+                                    <div className="flex gap-4 mt-1">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                name="readyToRelocateAbuDhabi" 
+                                                value="Yes"
+                                                checked={formData.readyToRelocateAbuDhabi === "Yes"}
+                                                onChange={handleInputChange}
+                                                className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm text-slate-700">Yes</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                name="readyToRelocateAbuDhabi" 
+                                                value="No"
+                                                checked={formData.readyToRelocateAbuDhabi === "No"}
+                                                onChange={handleInputChange}
+                                                className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm text-slate-700">No</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Job Preferences */}
+                        <section className="space-y-4">
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <Briefcase className="w-4 h-4 text-[#1E40AF]" />
+                                Job Preferences
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Expected Salary</label>
+                                    <input 
+                                        type="number" 
+                                        name="expectedSalary"
+                                        value={formData.expectedSalary}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Currency</label>
+                                    <select 
+                                        name="salaryCurrency"
+                                        value={formData.salaryCurrency}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium appearance-none"
+                                    >
+                                        <option value="AED">AED</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Additional Info */}
+                        <section className="space-y-4">
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <Globe className="w-4 h-4 text-[#1E40AF]" />
+                                Additional Information
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-slate-500">Languages (comma separated)</label>
+                                    <input 
+                                        type="text" 
+                                        name="languages"
+                                        value={formData.languages}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-medium text-slate-500">Portfolio Link</label>
+                                        <input 
+                                            type="url" 
+                                            name="portfolioLink"
+                                            value={formData.portfolioLink}
+                                            onChange={handleInputChange}
+                                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-medium text-slate-500">LinkedIn Profile</label>
+                                        <input 
+                                            type="url" 
+                                            name="linkedInProfile"
+                                            value={formData.linkedInProfile}
+                                            onChange={handleInputChange}
+                                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        {/* Confirmation */}
+                        <div className="bg-blue-50 rounded-xl p-4 flex gap-3 items-start">
+                            <input 
+                                type="checkbox" 
+                                name="agreed"
+                                checked={formData.agreed}
+                                onChange={handleCheckboxChange}
+                                className="mt-1 w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500"
+                            />
+                            <p className="text-xs text-blue-800 leading-relaxed">
+                                I confirm that the information provided above is accurate and up-to-date. I understand that providing false information may result in disqualification from the recruitment process.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
+                        <button 
+                            onClick={() => setShowEditModal(false)}
+                            className="px-6 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-100 transition-colors text-sm"
+                        >
+                            Close
+                        </button>
+                        <button 
+                            onClick={handleSave}
+                            disabled={!formData.agreed}
+                            className="px-6 py-3 rounded-xl bg-[#1E40AF] text-white font-semibold hover:bg-blue-800 transition-all shadow-lg shadow-blue-900/20 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            <Check className="w-4 h-4" />
+                            Save & Confirm
+                        </button>
+                    </div>
+                </motion.div>
+            </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -181,7 +505,15 @@ export default function CandidateProfile() {
              
              <div className="flex-1 space-y-4">
                <div>
-                 <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">{data.basicInfo.fullName}</h1>
+                 <div className="flex items-center gap-3 mb-1">
+                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{data.basicInfo.fullName}</h1>
+                     <button 
+                        onClick={() => setShowEditModal(true)}
+                        className="p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-50 hover:text-[#1E40AF] transition-colors"
+                     >
+                        <Edit2 className="w-4 h-4" />
+                     </button>
+                 </div>
                  <p className="text-lg text-[#1E40AF] font-medium">{data.positionInfo.positionApplied}</p>
                </div>
 
