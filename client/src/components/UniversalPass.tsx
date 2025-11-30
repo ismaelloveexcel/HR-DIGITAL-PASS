@@ -14,7 +14,14 @@ import {
   ListTodo,
   User,
   Settings,
-  ShieldCheck
+  ShieldCheck,
+  RotateCw,
+  FileText,
+  ArrowRight,
+  CheckSquare,
+  CalendarDays,
+  FileCheck,
+  ChevronRight
 } from 'lucide-react';
 import { UserData } from '@/lib/mockData';
 import { cn } from '@/lib/utils';
@@ -26,10 +33,56 @@ interface UniversalPassProps {
   user: UserData;
 }
 
+// Data for the back of the card
+const CANDIDATE_BACK_DATA = {
+  timeline: [
+    { stage: "Application", status: "completed", date: "Nov 25" },
+    { stage: "Screening", status: "completed", date: "Nov 26" },
+    { 
+      stage: "Assessment", 
+      status: "completed", 
+      date: "Nov 28",
+      components: {
+        softSkills: { required: true, status: "completed", link: "#" },
+        technical: { required: false, status: "skipped", link: "#" }
+      }
+    },
+    { 
+      stage: "Interview", 
+      status: "current", 
+      date: "Dec 05", 
+      time: "14:00", 
+      location: "HQ, Floor 4" 
+    },
+    { stage: "Offer", status: "pending", date: "-" },
+    { stage: "Onboarding", status: "pending", startDate: "-" }
+  ],
+  assessments: {
+    softSkills: { required: true, status: "Completed", link: "#" },
+    technical: { required: true, status: "Pending", link: "#" }
+  },
+  nextStep: {
+    label: "Final Interview",
+    date: "Dec 05",
+    time: "14:00 PM",
+    location: "Baynunah Tower, Floor 4",
+    instructions: "Please bring your original ID and portfolio."
+  },
+  documents: {
+    uploadedByCandidate: [
+      { type: "Resume/CV", url: "#", uploadedDate: "Nov 25" },
+      { type: "Portfolio", url: "#", uploadedDate: "Nov 25" }
+    ],
+    hrUpdates: [
+      { message: "Visa eligibility confirmed", date: "Nov 27" }
+    ]
+  }
+};
+
 export default function UniversalPass({ user }: UniversalPassProps) {
   const [expanded, setExpanded] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isHovering, setIsHovering] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   const [, setLocation] = useLocation();
 
@@ -38,20 +91,16 @@ export default function UniversalPass({ user }: UniversalPassProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Reset expansion when user changes
+  // Reset states when user changes
   useEffect(() => {
     setExpanded(false);
+    setIsFlipped(false);
   }, [user.code]);
 
   const toggleExpand = () => setExpanded(!expanded);
-
-  const getRoleColor = (role: string) => {
-    switch(role) {
-      case 'candidate': return 'text-blue-600 bg-blue-50 border-blue-100';
-      case 'manager': return 'text-purple-600 bg-purple-50 border-purple-100';
-      case 'onboarding': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-      default: return 'text-gray-600 bg-gray-50 border-gray-100';
-    }
+  const toggleFlip = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIsFlipped(!isFlipped);
   };
 
   const getRoleGradient = (role: string) => {
@@ -73,8 +122,8 @@ export default function UniversalPass({ user }: UniversalPassProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 font-sans bg-[#ffffffde] pt-[0px] pb-[0px] pl-[0px] pr-[0px]">
-      {/* Live Time Indicator - minimalist */}
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans bg-[#ffffffde]">
+      {/* Live Time Indicator */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -83,6 +132,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
         <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Local Time</p>
         <p className="text-sm font-mono text-slate-600">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
+
       <AnimatePresence mode="wait">
         {showVerification && (
           <motion.div
@@ -93,7 +143,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/10 backdrop-blur-md font-semibold"
           >
              <div className="w-full max-w-[320px] rounded-[24px] p-4 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] text-[#000000] flex flex-col bg-[#ffffff]">
-                {/* Close Button */}
                 <button 
                   onClick={() => setShowVerification(false)}
                   className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10"
@@ -105,7 +154,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                    <h2 className="text-lg font-bold tracking-tight mb-0.5 text-[#1E40AF] shrink-0">Verification Code</h2>
                    <p className="mb-3 shrink-0 text-slate-500 text-xs font-medium">Scan QR code or enter manually</p>
 
-                   {/* Large QR Card */}
                    <div 
                     className="bg-white p-3 rounded-2xl w-40 aspect-square flex items-center justify-center mb-3 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50 cursor-pointer hover:scale-105 transition-transform"
                     onClick={() => setLocation('/candidate-profile')}
@@ -115,7 +163,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                    <p className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold mb-2 shrink-0">OR enter code</p>
 
-                   {/* Code Box */}
                    <div className="w-full rounded-xl p-2.5 flex items-center justify-center relative mb-3 border border-slate-100 text-slate-700 bg-slate-50/80 shrink-0 shadow-inner">
                       <span className="font-mono tracking-[0.2em] text-base font-bold">N8EC-PS5D-9PKD</span>
                       <button className="absolute right-3 text-slate-400 hover:text-[#1E40AF] transition-colors">
@@ -123,7 +170,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                       </button>
                    </div>
 
-                   {/* User Info */}
                    <div className="mb-3 shrink-0 space-y-0">
                       <h3 className="text-[#1E40AF] text-base font-bold tracking-tight">{user.name}</h3>
                       <p className="text-slate-500 font-mono text-[10px] tracking-wider">{user.code}</p>
@@ -145,124 +191,255 @@ export default function UniversalPass({ user }: UniversalPassProps) {
              </div>
           </motion.div>
         )}
+
         {!expanded ? (
           <motion.div 
             key="compact"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-            }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="w-full max-w-[320px] relative z-10"
+            className="w-full max-w-[320px] h-[580px] relative z-10 perspective-1000"
+            style={{ perspective: '1000px' }}
           >
-            <div 
-              className="rounded-[40px] p-8 relative group transition-all duration-300 bg-[#ffffff]"
-              style={{
-                boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
-              }}
+            <motion.div
+              className="w-full h-full relative preserve-3d transition-all duration-700"
+              animate={{ rotateY: isFlipped ? 180 : 0 }}
+              transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+              style={{ transformStyle: 'preserve-3d' }}
             >
-              {/* Security Strip - Minimal */}
-              <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50", getRoleGradient(user.role))} />
-
-              <div className="flex flex-col items-center text-center relative z-10 mt-2">
-                {/* Logo */}
-                <div className="h-6 mb-2 flex items-center justify-center w-full">
-                  <img src={logo} alt="Baynunah" className="h-full object-contain invert opacity-80" />
-                </div>
-
-                {/* Pass Type */}
-                <p className="tracking-[0.2em] uppercase font-medium mt-[0px] mb-[0px] text-[16px] pt-[5px] pb-[5px] bg-[transparent] text-[#62748e]">
-                  {getPassType(user.role)}
-                </p>
-
-                {/* QR Code (Primary) */}
-                <div className="relative flex flex-col items-center group cursor-pointer mb-6" onClick={() => setShowVerification(true)}>
-                  <div className="w-40 h-40 relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300 pt-[0px] pb-[0px] mt-[15px] mb-[15px]">
-                    {/* Subtle Scan Animation */}
-                    <motion.div 
-                        className="absolute left-2 right-2 h-[1.5px] bg-gradient-to-r from-transparent via-blue-400/40 to-transparent z-10"
-                        animate={{ top: ["15%", "85%"], opacity: [0, 1, 0] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    />
-
-                    {/* Corner Brackets */}
-                    <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-slate-100 rounded-tl-xl" />
-                    <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-slate-100 rounded-tr-xl" />
-                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-slate-100 rounded-bl-xl" />
-                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-slate-100 rounded-br-xl" />
-                    
-                    {/* 3D Embossed QR */}
-                    <div className="filter drop-shadow-[4px_4px_6px_rgba(0,0,0,0.1)]">
-                      <QRCodeSVG 
-                        value={`https://baynunah-pass.com/pass/${user.code}`} 
-                        size={120} 
-                        fgColor="#64748b" 
-                        bgColor="transparent"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Status Dot */}
-                  <div className="px-3 py-1 rounded-full text-[10px] font-medium border border-slate-100 shadow-sm whitespace-nowrap uppercase tracking-wider flex items-center gap-1.5 bg-white/80 backdrop-blur-sm text-slate-500 mt-[0px] mb-[0px] pt-[0px] pb-[0px]">
-                    <span className={cn("w-1.5 h-1.5 rounded-full", user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
-                    {user.status}
-                  </div>
-                </div>
-
-                {/* Identity */}
-                <div className="space-y-1 mt-2">
-                  <h1 className="text-2xl font-bold tracking-tight mt-[0px] mb-[0px] text-[#193cb8]">{user.name}</h1>
-                  <p className="text-slate-500 font-medium text-xs uppercase tracking-wider pt-[5px] pb-[5px]">{user.title}</p>
-                  {user.department && (
-                    <p className="text-slate-400 text-[10px] font-medium mt-1">
-                      {user.department}
-                    </p>
-                  )}
-                </div>
-
-                {/* Recruitment Stage Indicator - Reveal on Hover */}
-                <motion.div 
-                  className="w-full overflow-hidden h-0 group-hover:h-auto transition-all duration-500 ease-in-out"
+              {/* FRONT FACE */}
+              <div 
+                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-[#ffffff] flex flex-col items-center text-center"
+                style={{ 
+                    backfaceVisibility: 'hidden',
+                    boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
+                }}
+              >
+                {/* Flip Button */}
+                <button 
+                  onClick={toggleFlip}
+                  className="absolute top-6 right-6 p-2 rounded-full text-slate-400 hover:text-[#1E40AF] hover:bg-blue-50 transition-colors z-20"
                 >
-                  <div className="w-full mt-2 pt-4 border-t border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                    <div className="flex justify-between items-end mb-2">
-                      <div className="flex flex-col text-left">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
-                        <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide">Interview</span>
-                      </div>
-                      <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
+                  <RotateCw className="w-4 h-4" />
+                </button>
+
+                {/* Security Strip */}
+                <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50 rounded-t-[40px]", getRoleGradient(user.role))} />
+
+                <div className="flex flex-col items-center w-full h-full pt-4">
+                    {/* Logo */}
+                    <div className="h-6 mb-4 flex items-center justify-center w-full">
+                        <img src={logo} alt="Baynunah" className="h-full object-contain opacity-80" />
                     </div>
-                    
-                    {/* Simple Segmented Progress Bar */}
-                    <div className="flex gap-1 h-1.5 w-full">
-                      {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
-                        const currentStageIndex = 3; // Interview
-                        const isActive = i === currentStageIndex;
-                        const isCompleted = i < currentStageIndex;
+
+                    {/* Pass Type */}
+                    <p className="tracking-[0.2em] uppercase font-medium text-[14px] text-[#62748e] mb-8">
+                        {getPassType(user.role)}
+                    </p>
+
+                    {/* QR Code Area */}
+                    <div className="relative flex flex-col items-center group cursor-pointer mb-8" onClick={() => setShowVerification(true)}>
+                        <div className="w-48 h-48 relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300 bg-white rounded-3xl shadow-[inset_2px_2px_5px_#d1d9e6,inset_-2px_-2px_5px_#ffffff] p-4">
+                             {/* Corner Brackets */}
+                             <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-slate-300 rounded-tl-lg" />
+                             <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-slate-300 rounded-tr-lg" />
+                             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-slate-300 rounded-bl-lg" />
+                             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-slate-300 rounded-br-lg" />
+
+                             {/* Subtle Scan Animation */}
+                             <motion.div 
+                                className="absolute left-4 right-4 h-[1.5px] bg-gradient-to-r from-transparent via-blue-400/60 to-transparent z-10"
+                                animate={{ top: ["10%", "90%"], opacity: [0, 1, 0] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            />
+                            
+                            <QRCodeSVG 
+                                value={`https://baynunah-pass.com/pass/${user.code}`} 
+                                size={140} 
+                                fgColor="#334155" 
+                                bgColor="transparent"
+                            />
+                        </div>
                         
-                        return (
-                          <div 
-                            key={stage} 
-                            className={cn(
-                              "h-full rounded-full flex-1 transition-colors",
-                              isActive ? "bg-[#1E40AF]" : 
-                              isCompleted ? "bg-emerald-400" : 
-                              "bg-slate-200"
-                            )} 
-                          />
-                        );
-                      })}
+                        <div className="absolute -bottom-3 bg-white px-4 py-1 rounded-full shadow-sm border border-slate-100 flex items-center gap-1.5">
+                            <span className={cn("w-1.5 h-1.5 rounded-full", user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{user.status}</span>
+                        </div>
                     </div>
-                  </div>
-                </motion.div>
-                
-                {/* Bottom indicator when not hovering */}
-                <div className="h-1 w-12 bg-slate-300 rounded-full mx-auto group-hover:w-0 group-hover:opacity-0 transition-all duration-300 mt-4" />
+
+                    {/* Identity */}
+                    <div className="space-y-1 mb-6">
+                        <h1 className="text-2xl font-bold tracking-tight text-[#1E40AF]">{user.name}</h1>
+                        <p className="text-slate-500 font-medium text-xs uppercase tracking-wider">{user.title}</p>
+                        {user.department && (
+                            <p className="text-slate-400 text-[10px] font-medium mt-1">{user.department}</p>
+                        )}
+                    </div>
+
+                    {/* Recruitment Status Widget (Static) */}
+                    <div className="w-full mt-auto pt-4 border-t border-slate-100 hover:bg-slate-50 transition-colors rounded-xl p-2 cursor-pointer group" onClick={() => setLocation('/candidate-profile')}>
+                        <div className="flex justify-between items-end mb-2">
+                            <div className="flex flex-col text-left">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
+                                <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide flex items-center gap-1">
+                                    Interview
+                                    <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-[#1E40AF] transition-colors" />
+                                </span>
+                            </div>
+                            <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
+                        </div>
+                        
+                        <div className="flex gap-1 h-1.5 w-full">
+                            {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
+                                const currentStageIndex = 3;
+                                const isActive = i === currentStageIndex;
+                                const isCompleted = i < currentStageIndex;
+                                return (
+                                    <div 
+                                        key={stage} 
+                                        className={cn(
+                                            "h-full rounded-full flex-1 transition-colors",
+                                            isActive ? "bg-[#1E40AF]" : 
+                                            isCompleted ? "bg-emerald-400" : 
+                                            "bg-slate-200"
+                                        )} 
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
               </div>
-            </div>
+
+              {/* BACK FACE (4 Menu Tiles) */}
+              <div 
+                className="absolute inset-0 backface-hidden rounded-[40px] p-6 bg-[#f8fafc] flex flex-col"
+                style={{ 
+                    backfaceVisibility: 'hidden',
+                    transform: 'rotateY(180deg)',
+                    boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
+                }}
+              >
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-2">
+                        <img src={logo} alt="Baynunah" className="h-4 object-contain opacity-60" />
+                        <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Pass Menu</span>
+                    </div>
+                    <button 
+                        onClick={toggleFlip}
+                        className="p-2 rounded-full text-slate-400 hover:text-[#1E40AF] hover:bg-blue-50 transition-colors"
+                    >
+                        <RotateCw className="w-4 h-4" />
+                    </button>
+                </div>
+
+                {/* Grid Layout */}
+                <div className="grid grid-cols-2 grid-rows-2 gap-3 flex-1 h-full">
+                    
+                    {/* Tile A: Timeline */}
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col overflow-hidden hover:shadow-md transition-shadow relative group">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
+                                <CalendarDays className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Timeline</span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
+                            {CANDIDATE_BACK_DATA.timeline.map((item, i) => (
+                                <div key={i} className="flex items-start gap-2">
+                                    <div className={cn(
+                                        "w-1.5 h-1.5 rounded-full mt-1.5 shrink-0",
+                                        item.status === 'completed' ? "bg-emerald-500" : 
+                                        item.status === 'current' ? "bg-blue-600 animate-pulse" : "bg-slate-200"
+                                    )} />
+                                    <div className="flex-1">
+                                        <p className={cn("text-[10px] font-semibold leading-tight", item.status === 'upcoming' ? "text-slate-400" : "text-slate-700")}>{item.stage}</p>
+                                        {item.date && item.date !== '-' && <p className="text-[9px] text-slate-400">{item.date}</p>}
+                                    </div>
+                                    {item.status === 'completed' && <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Tile B: Assessments */}
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow group">
+                         <div className="flex items-center gap-2 mb-3">
+                            <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
+                                <CheckSquare className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Tasks</span>
+                        </div>
+                        <div className="space-y-3">
+                             <div className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
+                                <span className="text-[10px] font-medium text-slate-600">Soft Skills</span>
+                                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Done</span>
+                             </div>
+                             <div className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
+                                <span className="text-[10px] font-medium text-slate-600">Technical</span>
+                                <a href="#" className="text-[9px] font-bold text-blue-600 hover:underline flex items-center gap-0.5">
+                                    Start <ArrowRight className="w-2 h-2" />
+                                </a>
+                             </div>
+                        </div>
+                    </div>
+
+                    {/* Tile C: Next Step */}
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow col-span-2 h-24">
+                        <div className="flex justify-between items-start">
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+                                    <Clock className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Next Step</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-[#1E40AF] bg-blue-50 px-2 py-0.5 rounded-full">{CANDIDATE_BACK_DATA.nextStep.date}</span>
+                        </div>
+                        <div className="mt-1 pl-1">
+                            <p className="text-sm font-bold text-slate-800">{CANDIDATE_BACK_DATA.nextStep.label}</p>
+                            <div className="flex gap-3 mt-1">
+                                <p className="text-[10px] text-slate-500 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" /> {CANDIDATE_BACK_DATA.nextStep.time}
+                                </p>
+                                <p className="text-[10px] text-slate-500 flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" /> {CANDIDATE_BACK_DATA.nextStep.location}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tile D: Documents */}
+                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow col-span-2 h-32">
+                         <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 rounded-lg bg-orange-50 text-orange-600">
+                                <FileText className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Documents</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            {CANDIDATE_BACK_DATA.documents.uploadedByCandidate.map((doc, i) => (
+                                <div key={i} className="p-2 bg-slate-50 rounded-lg border border-slate-100 flex items-center gap-2">
+                                    <FileCheck className="w-4 h-4 text-slate-400" />
+                                    <div className="overflow-hidden">
+                                        <p className="text-[10px] font-semibold text-slate-700 truncate">{doc.type}</p>
+                                        <p className="text-[8px] text-slate-400">Uploaded {doc.uploadedDate}</p>
+                                    </div>
+                                </div>
+                            ))}
+                             {CANDIDATE_BACK_DATA.documents.hrUpdates.map((update, i) => (
+                                <div key={i + 10} className="p-2 bg-blue-50/50 rounded-lg border border-blue-100 col-span-2 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                    <p className="text-[10px] font-medium text-blue-800">{update.message}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+              </div>
+
+            </motion.div>
           </motion.div>
         ) : (
           <motion.div 
