@@ -1,0 +1,143 @@
+FLIP CARD → SHOW 4 OPTIONS
+
+On flipping the card, display 4 menu tiles:
+
+A) Timeline
+
+Use the following structure:
+
+{
+  "timeline": [
+    {
+      "stage": "Application",
+      "status": "",
+      "date": ""
+    },
+    {
+      "stage": "Screening",
+      "status": "",
+      "date": ""
+    },
+    {
+      "stage": "Assessment",
+      "status": "",
+      "date": "",
+      "components": {
+        "softSkills": {
+          "required": true,
+          "status": "",
+          "link": ""
+        },
+        "technical": {
+          "required": false,
+          "status": "",
+          "link": ""
+        }
+      }
+    },
+    {
+      "stage": "Interview",
+      "status": "",
+      "date": "",
+      "time": "",
+      "location": ""
+    },
+    {
+      "stage": "Offer",
+      "status": "",
+      "date": ""
+    },
+    {
+      "stage": "Onboarding",
+      "status": "",
+      "startDate": ""
+    }
+  ]
+}
+
+
+Display them vertically with checkmarks/pending icons.
+
+B) Assessments
+
+Do NOT show scores or evaluations.
+Show only:
+
+{
+  "assessments": {
+    "softSkills": {
+      "required": true,
+      "status": "",
+      "link": ""
+    },
+    "technical": {
+      "required": false,
+      "status": "",
+      "link": ""
+    }
+  }
+}
+
+
+If completed → gray and marked “Completed”.
+If pending → clickable link.
+
+C) Next Step
+{
+  "nextStep": {
+    "label": "",
+    "date": "",
+    "time": "",
+    "location": "",
+    "instructions": ""
+  }
+}
+
+
+Purely logistical info.
+No evaluation.
+No internal comments.
+
+D) Documents
+{
+  "documents": {
+    "uploadedByCandidate": [
+      {
+        "type": "",
+        "url": "",
+        "uploadedDate": ""
+      }
+    ],
+    "hrUpdates": [
+      {
+        "message": "",
+        "date": ""
+      }
+    ]
+  }
+}
+
+
+Shows: CV, portfolio, cover letter, certificates, etc.
+Shows HR neutral updates only.
+No internal notes.
+
+4. NO INTERNAL FIELDS
+
+Do NOT include:
+
+scores
+
+behavioural traits
+
+match score
+
+internal comments
+
+manager feedback
+
+evaluation summaries
+
+rejection reasons
+
+This structure is 100% candidate-safe.
