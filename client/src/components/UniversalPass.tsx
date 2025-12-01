@@ -230,7 +230,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 <div className="flex flex-col items-center w-full h-full pt-4">
                     {/* Logo */}
                     <div className="h-6 mb-4 flex items-center justify-center w-full">
-                        <img src={logo} alt="Baynunah" className="h-full object-contain opacity-80 mix-blend-multiply" />
+                        <img src={logo} alt="Baynunah" className="h-full object-contain invert opacity-80" />
                     </div>
 
                     {/* Pass Type */}
