@@ -132,7 +132,6 @@ export default function UniversalPass({ user }: UniversalPassProps) {
         <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Local Time</p>
         <p className="text-sm font-mono text-slate-600">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
-
       <AnimatePresence mode="wait">
         {showVerification && (
           <motion.div
@@ -287,7 +286,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                             >
                                 <div className="flex justify-between items-end mb-2">
                                     <div className="flex flex-col text-left">
-                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
+                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Recruitment Stage</span>
                                         <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide flex items-center gap-1">
                                             Interview
                                             <ChevronRight className="w-3 h-3 text-slate-300 hover:text-[#1E40AF] transition-colors" />
