@@ -210,7 +210,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             >
               {/* FRONT FACE */}
               <div 
-                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-[#ffffff] flex flex-col items-center text-center"
+                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-[#ffffff] flex flex-col items-center text-center group"
                 style={{ 
                     backfaceVisibility: 'hidden',
                     boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
@@ -239,8 +239,8 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                     </p>
 
                     {/* QR Code Area */}
-                    <div className="relative flex flex-col items-center group cursor-pointer mb-8" onClick={() => setShowVerification(true)}>
-                        <div className="w-48 h-48 relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300 bg-white rounded-3xl shadow-[inset_2px_2px_5px_#d1d9e6,inset_-2px_-2px_5px_#ffffff] p-4">
+                    <div className="relative flex flex-col items-center group/qr cursor-pointer mb-8" onClick={() => setShowVerification(true)}>
+                        <div className="w-48 h-48 relative flex items-center justify-center group-hover/qr:scale-105 transition-transform duration-300 bg-white rounded-3xl shadow-[inset_2px_2px_5px_#d1d9e6,inset_-2px_-2px_5px_#ffffff] p-4">
                              {/* Corner Brackets */}
                              <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-slate-300 rounded-tl-lg" />
                              <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-slate-300 rounded-tr-lg" />
@@ -277,37 +277,48 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                         )}
                     </div>
 
-                    {/* Recruitment Status Widget (Static) */}
-                    <div className="w-full mt-auto pt-4 border-t border-slate-100 hover:bg-slate-50 transition-colors rounded-xl p-2 cursor-pointer group" onClick={() => setLocation('/candidate-profile')}>
-                        <div className="flex justify-between items-end mb-2">
-                            <div className="flex flex-col text-left">
-                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
-                                <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide flex items-center gap-1">
-                                    Interview
-                                    <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-[#1E40AF] transition-colors" />
-                                </span>
+                    {/* Recruitment Status Widget - Reveals on Hover */}
+                    <div className="w-full mt-auto relative">
+                        {/* Hidden Container */}
+                        <div className="overflow-hidden max-h-0 opacity-0 group-hover:max-h-[140px] group-hover:opacity-100 transition-all duration-500 ease-out">
+                            <div 
+                                className="pt-4 border-t border-slate-100 hover:bg-slate-50 transition-colors rounded-xl p-2 cursor-pointer" 
+                                onClick={() => setLocation('/candidate-profile')}
+                            >
+                                <div className="flex justify-between items-end mb-2">
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status</span>
+                                        <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide flex items-center gap-1">
+                                            Interview
+                                            <ChevronRight className="w-3 h-3 text-slate-300 hover:text-[#1E40AF] transition-colors" />
+                                        </span>
+                                    </div>
+                                    <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
+                                </div>
+                                
+                                <div className="flex gap-1 h-1.5 w-full">
+                                    {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
+                                        const currentStageIndex = 3;
+                                        const isActive = i === currentStageIndex;
+                                        const isCompleted = i < currentStageIndex;
+                                        return (
+                                            <div 
+                                                key={stage} 
+                                                className={cn(
+                                                    "h-full rounded-full flex-1 transition-colors",
+                                                    isActive ? "bg-[#1E40AF]" : 
+                                                    isCompleted ? "bg-emerald-400" : 
+                                                    "bg-slate-200"
+                                                )} 
+                                            />
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
                         </div>
                         
-                        <div className="flex gap-1 h-1.5 w-full">
-                            {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
-                                const currentStageIndex = 3;
-                                const isActive = i === currentStageIndex;
-                                const isCompleted = i < currentStageIndex;
-                                return (
-                                    <div 
-                                        key={stage} 
-                                        className={cn(
-                                            "h-full rounded-full flex-1 transition-colors",
-                                            isActive ? "bg-[#1E40AF]" : 
-                                            isCompleted ? "bg-emerald-400" : 
-                                            "bg-slate-200"
-                                        )} 
-                                    />
-                                );
-                            })}
-                        </div>
+                        {/* Handle Indicator (Visible when hidden) */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-200 rounded-full opacity-100 group-hover:opacity-0 transition-opacity duration-300 delay-100" />
                     </div>
                 </div>
               </div>
