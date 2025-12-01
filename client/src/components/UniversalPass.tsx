@@ -336,102 +336,106 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 </div>
 
                 {/* Grid Layout */}
-                <div className="grid grid-cols-2 grid-rows-2 gap-3 flex-1 h-full">
+                <div className="flex flex-col gap-3 flex-1 h-full overflow-y-auto pb-2 custom-scrollbar">
                     
-                    {/* Tile A: Timeline */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col overflow-hidden hover:shadow-md transition-shadow relative group">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
-                                <CalendarDays className="w-3.5 h-3.5" />
-                            </div>
-                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Timeline</span>
-                        </div>
-                        <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
-                            {CANDIDATE_BACK_DATA.timeline.map((item, i) => (
-                                <div key={i} className="flex items-start gap-2">
-                                    <div className={cn(
-                                        "w-1.5 h-1.5 rounded-full mt-1.5 shrink-0",
-                                        item.status === 'completed' ? "bg-emerald-500" : 
-                                        item.status === 'current' ? "bg-blue-600 animate-pulse" : "bg-slate-200"
-                                    )} />
-                                    <div className="flex-1">
-                                        <p className={cn("text-[10px] font-semibold leading-tight", item.status === 'upcoming' ? "text-slate-400" : "text-slate-700")}>{item.stage}</p>
-                                        {item.date && item.date !== '-' && <p className="text-[9px] text-slate-400">{item.date}</p>}
-                                    </div>
-                                    {item.status === 'completed' && <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />}
+                    <div className="flex gap-3 h-[170px] shrink-0">
+                        {/* Tile A: Timeline */}
+                        <div className="flex-1 bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col overflow-hidden hover:shadow-md transition-shadow relative group">
+                            <div className="flex items-center gap-2 mb-2 shrink-0">
+                                <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
+                                    <CalendarDays className="w-3 h-3" />
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Tile B: Assessments */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow group">
-                         <div className="flex items-center gap-2 mb-3">
-                            <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
-                                <CheckSquare className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wide">Timeline</span>
                             </div>
-                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Tasks</span>
+                            <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 custom-scrollbar">
+                                {CANDIDATE_BACK_DATA.timeline.map((item, i) => (
+                                    <div key={i} className="flex items-start gap-2">
+                                        <div className={cn(
+                                            "w-1.5 h-1.5 rounded-full mt-1 shrink-0",
+                                            item.status === 'completed' ? "bg-emerald-500" : 
+                                            item.status === 'current' ? "bg-blue-600 animate-pulse" : "bg-slate-200"
+                                        )} />
+                                        <div className="flex-1">
+                                            <p className={cn("text-[9px] font-semibold leading-tight", item.status === 'upcoming' ? "text-slate-400" : "text-slate-700")}>{item.stage}</p>
+                                            {item.date && item.date !== '-' && <p className="text-[8px] text-slate-400">{item.date}</p>}
+                                        </div>
+                                        {item.status === 'completed' && <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div className="space-y-3">
-                             <div className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
-                                <span className="text-[10px] font-medium text-slate-600">Soft Skills</span>
-                                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Done</span>
-                             </div>
-                             <div className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
-                                <span className="text-[10px] font-medium text-slate-600">Technical</span>
-                                <a href="#" className="text-[9px] font-bold text-blue-600 hover:underline flex items-center gap-0.5">
-                                    Start <ArrowRight className="w-2 h-2" />
-                                </a>
-                             </div>
+
+                        {/* Tile B: Assessments */}
+                        <div className="flex-1 bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow group">
+                             <div className="flex items-center gap-2 mb-2 shrink-0">
+                                <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
+                                    <CheckSquare className="w-3 h-3" />
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wide">Tasks</span>
+                            </div>
+                            <div className="space-y-2 overflow-y-auto custom-scrollbar">
+                                 <div className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
+                                    <span className="text-[9px] font-medium text-slate-600">Soft Skills</span>
+                                    <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Done</span>
+                                 </div>
+                                 <div className="flex flex-col p-2 bg-slate-50 rounded-lg border border-slate-100 gap-1.5">
+                                    <div className="flex justify-between items-center w-full">
+                                        <span className="text-[9px] font-medium text-slate-600">Technical</span>
+                                    </div>
+                                    <a href="#" className="text-[8px] font-bold text-blue-600 hover:underline flex items-center gap-0.5 self-end bg-white px-2 py-1 rounded border border-blue-100 shadow-sm">
+                                        Start <ArrowRight className="w-2 h-2" />
+                                    </a>
+                                 </div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Tile C: Next Step */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow col-span-2 h-24">
+                    <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow shrink-0 h-[84px]">
                         <div className="flex justify-between items-start">
                             <div className="flex items-center gap-2 mb-1">
                                 <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
-                                    <Clock className="w-3.5 h-3.5" />
+                                    <Clock className="w-3 h-3" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Next Step</span>
+                                <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wide">Next Step</span>
                             </div>
-                            <span className="text-[10px] font-bold text-[#1E40AF] bg-blue-50 px-2 py-0.5 rounded-full">{CANDIDATE_BACK_DATA.nextStep.date}</span>
+                            <span className="text-[9px] font-bold text-[#1E40AF] bg-blue-50 px-2 py-0.5 rounded-full">{CANDIDATE_BACK_DATA.nextStep.date}</span>
                         </div>
                         <div className="mt-1 pl-1">
-                            <p className="text-sm font-bold text-slate-800">{CANDIDATE_BACK_DATA.nextStep.label}</p>
+                            <p className="text-sm font-bold text-slate-800 leading-tight">{CANDIDATE_BACK_DATA.nextStep.label}</p>
                             <div className="flex gap-3 mt-1">
-                                <p className="text-[10px] text-slate-500 flex items-center gap-1">
-                                    <Clock className="w-3 h-3" /> {CANDIDATE_BACK_DATA.nextStep.time}
+                                <p className="text-[9px] text-slate-500 flex items-center gap-1">
+                                    <Clock className="w-2.5 h-2.5" /> {CANDIDATE_BACK_DATA.nextStep.time}
                                 </p>
-                                <p className="text-[10px] text-slate-500 flex items-center gap-1">
-                                    <MapPin className="w-3 h-3" /> {CANDIDATE_BACK_DATA.nextStep.location}
+                                <p className="text-[9px] text-slate-500 flex items-center gap-1 truncate">
+                                    <MapPin className="w-2.5 h-2.5" /> {CANDIDATE_BACK_DATA.nextStep.location}
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     {/* Tile D: Documents */}
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow col-span-2 h-32">
+                    <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow shrink-0">
                          <div className="flex items-center gap-2 mb-2">
                             <div className="p-1.5 rounded-lg bg-orange-50 text-orange-600">
-                                <FileText className="w-3.5 h-3.5" />
+                                <FileText className="w-3 h-3" />
                             </div>
-                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Documents</span>
+                            <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wide">Documents</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             {CANDIDATE_BACK_DATA.documents.uploadedByCandidate.map((doc, i) => (
                                 <div key={i} className="p-2 bg-slate-50 rounded-lg border border-slate-100 flex items-center gap-2">
-                                    <FileCheck className="w-4 h-4 text-slate-400" />
+                                    <FileCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                                     <div className="overflow-hidden">
-                                        <p className="text-[10px] font-semibold text-slate-700 truncate">{doc.type}</p>
+                                        <p className="text-[9px] font-semibold text-slate-700 truncate">{doc.type}</p>
                                         <p className="text-[8px] text-slate-400">Uploaded {doc.uploadedDate}</p>
                                     </div>
                                 </div>
                             ))}
                              {CANDIDATE_BACK_DATA.documents.hrUpdates.map((update, i) => (
                                 <div key={i + 10} className="p-2 bg-blue-50/50 rounded-lg border border-blue-100 col-span-2 flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                    <p className="text-[10px] font-medium text-blue-800">{update.message}</p>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                                    <p className="text-[9px] font-medium text-blue-800 truncate">{update.message}</p>
                                 </div>
                             ))}
                         </div>
