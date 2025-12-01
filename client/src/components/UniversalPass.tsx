@@ -497,47 +497,59 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.2 }}
-                                className="grid grid-cols-2 grid-rows-2 gap-4 h-full pb-2"
+                                className="grid grid-cols-2 gap-2 h-full pb-2 w-full max-w-[260px] mx-auto aspect-square place-content-center"
                             >
-                                {/* Menu Tiles matching the image */}
+                                {/* Menu Tiles matching the attached petal design */}
+                                {/* Top Left - Timeline */}
                                 <button 
                                     onClick={() => setActiveSection('timeline')}
-                                    className="bg-white rounded-[24px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 group"
+                                    className="w-full h-full bg-white text-slate-400 hover:text-[#cc39a4] transition-all duration-200 hover:-translate-x-1 hover:-translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    style={{
+                                        borderRadius: '90px 5px 5px 5px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                    }}
                                 >
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-500 group-hover:text-blue-600 group-hover:bg-blue-50 flex items-center justify-center transition-colors">
-                                        <CalendarDays className="w-6 h-6" />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Timeline</span>
+                                    <CalendarDays className="w-8 h-8" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Timeline</span>
                                 </button>
 
+                                {/* Top Right - Evaluations */}
                                 <button 
                                     onClick={() => setActiveSection('evaluations')}
-                                    className="bg-white rounded-[24px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 group"
+                                    className="w-full h-full bg-white text-slate-400 hover:text-[#03a9f4] transition-all duration-200 hover:translate-x-1 hover:-translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    style={{
+                                        borderRadius: '5px 90px 5px 5px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                    }}
                                 >
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-500 group-hover:text-purple-600 group-hover:bg-purple-50 flex items-center justify-center transition-colors">
-                                        <CheckSquare className="w-6 h-6" />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-purple-600 transition-colors">Evaluations</span>
+                                    <CheckSquare className="w-8 h-8" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Evaluations</span>
                                 </button>
 
+                                {/* Bottom Left - Next Step */}
                                 <button 
                                     onClick={() => setActiveSection('next')}
-                                    className="bg-white rounded-[24px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 group"
+                                    className="w-full h-full bg-white text-slate-400 hover:text-[#8c9eff] transition-all duration-200 hover:-translate-x-1 hover:translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    style={{
+                                        borderRadius: '5px 5px 5px 90px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                    }}
                                 >
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-500 group-hover:text-emerald-600 group-hover:bg-emerald-50 flex items-center justify-center transition-colors">
-                                        <ArrowRight className="w-6 h-6" />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-emerald-600 transition-colors">Next</span>
+                                    <ArrowRight className="w-8 h-8" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Next</span>
                                 </button>
 
+                                {/* Bottom Right - Documents */}
                                 <button 
                                     onClick={() => setActiveSection('documents')}
-                                    className="bg-white rounded-[24px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] border border-slate-50 flex flex-col items-center justify-center gap-3 transition-all hover:-translate-y-1 group"
+                                    className="w-full h-full bg-white text-slate-400 hover:text-orange-500 transition-all duration-200 hover:translate-x-1 hover:translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    style={{
+                                        borderRadius: '5px 5px 90px 5px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                    }}
                                 >
-                                    <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-500 group-hover:text-orange-600 group-hover:bg-orange-50 flex items-center justify-center transition-colors">
-                                        <FileText className="w-6 h-6" />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-orange-600 transition-colors">Documents</span>
+                                    <FileText className="w-8 h-8" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Documents</span>
                                 </button>
                             </motion.div>
                         )}
