@@ -381,21 +381,21 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                                 <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
                                     <CheckSquare className="w-3 h-3" />
                                 </div>
-                                <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wide">Tasks</span>
+                                <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wide">Assessments</span>
                             </div>
                             <div className="space-y-2 overflow-y-auto custom-scrollbar">
-                                 <div className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span className="text-[9px] font-medium text-slate-600">Soft Skills</span>
-                                    <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Done</span>
-                                 </div>
-                                 <div className="flex flex-col p-2 bg-slate-50 rounded-lg border border-slate-100 gap-1.5">
-                                    <div className="flex justify-between items-center w-full">
-                                        <span className="text-[9px] font-medium text-slate-600">Technical</span>
-                                    </div>
-                                    <a href="#" className="text-[8px] font-bold text-blue-600 hover:underline flex items-center gap-0.5 self-end bg-white px-2 py-1 rounded border border-blue-100 shadow-sm">
-                                        Start <ArrowRight className="w-2 h-2" />
-                                    </a>
-                                 </div>
+                                 {Object.entries(CANDIDATE_BACK_DATA.assessments).map(([key, data]) => (
+                                     <div key={key} className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span className="text-[9px] font-medium text-slate-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                        {data.status === 'Completed' ? (
+                                            <span className="text-[8px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">Completed</span>
+                                        ) : (
+                                            <a href={data.link} className="text-[8px] font-bold text-blue-600 hover:underline flex items-center gap-0.5 bg-white px-2 py-0.5 rounded border border-blue-100 shadow-sm">
+                                                Start <ArrowRight className="w-2 h-2" />
+                                            </a>
+                                        )}
+                                     </div>
+                                 ))}
                             </div>
                         </div>
                     </div>
