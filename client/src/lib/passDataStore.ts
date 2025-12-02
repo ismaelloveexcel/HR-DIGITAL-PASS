@@ -732,10 +732,11 @@ export function updateLinkSlot(
   const targetSlot = updatedSlots.find((slot) => slot.id === slotId);
   if (!targetSlot) return undefined;
 
+  const effectiveStatus = updates.status ?? targetSlot.status;
   if (
     targetSlot.status === 'booked' ||
     updates.status === 'booked' ||
-    (updates.candidateCode && (updates.status ?? targetSlot.status) === 'booked')
+    (updates.candidateCode && effectiveStatus === 'booked')
   ) {
     const candidateCode = updates.candidateCode ?? targetSlot.candidateCode;
     if (candidateCode) {
