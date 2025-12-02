@@ -20,7 +20,21 @@ import {
   downloadAsJSON,
   uploadFromFile,
   resetToDefaults,
+  getPassSettings,
+  updatePassSettings,
+  toggleModule,
+  toggleAutomation,
+  getLinksForCode,
+  updateLinkSlot,
+  getUniversalRecord,
+  updateUniversalRecord,
   type PassDataStore,
+  type PassSettings,
+  type PassLink,
+  type PassLinkSlot,
+  type PassModules,
+  type PassAutomations,
+  type UniversalPassRecord,
 } from '@/lib/passDataStore';
 import type { CandidateWithRelations, TimelineEntry } from '@shared/schema';
 
@@ -80,6 +94,53 @@ export function usePassData() {
     return deleteTimelineEntry(code, entryId);
   }, []);
 
+  const getBlueprint = useCallback((code: string): UniversalPassRecord => {
+    return getUniversalRecord(code);
+  }, []);
+
+  const editBlueprint = useCallback((
+    code: string,
+    updates: Partial<UniversalPassRecord>,
+  ): UniversalPassRecord => {
+    return updateUniversalRecord(code, updates);
+  }, []);
+
+  const getSettings = useCallback((code: string): PassSettings => {
+    return getPassSettings(code);
+  }, []);
+
+  const editSettings = useCallback((code: string, updates: Partial<PassSettings>): PassSettings => {
+    return updatePassSettings(code, updates);
+  }, []);
+
+  const toggleModuleVisibility = useCallback((
+    code: string,
+    module: keyof PassModules,
+    value?: boolean,
+  ): PassSettings => {
+    return toggleModule(code, module, value);
+  }, []);
+
+  const toggleAutomationPref = useCallback((
+    code: string,
+    automation: keyof PassAutomations,
+    value?: boolean,
+  ): PassSettings => {
+    return toggleAutomation(code, automation, value);
+  }, []);
+
+  const listLinksForCode = useCallback((code: string): PassLink[] => {
+    return getLinksForCode(code);
+  }, []);
+
+  const mutateLinkSlot = useCallback((
+    linkId: string,
+    slotId: string,
+    updates: Partial<PassLinkSlot>,
+  ): PassLink | undefined => {
+    return updateLinkSlot(linkId, slotId, updates);
+  }, []);
+
   const exportData = useCallback((): string => {
     return exportToJSON();
   }, []);
@@ -117,6 +178,8 @@ export function usePassData() {
     addTimeline,
     editTimeline,
     removeTimeline,
+    getUniversalRecord: getBlueprint,
+    updateUniversalRecord: editBlueprint,
     
     // Export/Import
     exportData,
@@ -126,5 +189,13 @@ export function usePassData() {
     
     // Reset
     reset,
+
+    // Settings & Links
+    getPassSettings: getSettings,
+    updatePassSettings: editSettings,
+    toggleModuleVisibility,
+    toggleAutomationPref,
+    getLinksForCode: listLinksForCode,
+    updateLinkSlot: mutateLinkSlot,
   };
 }
