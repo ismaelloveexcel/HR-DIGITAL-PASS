@@ -497,59 +497,59 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.2 }}
-                                className="grid grid-cols-2 gap-2 h-full pb-2 w-full max-w-[260px] mx-auto aspect-square place-content-center"
+                                className="grid grid-cols-2 gap-2 w-full max-w-[280px] mx-auto place-content-center flex-1"
                             >
                                 {/* Menu Tiles matching the attached petal design */}
                                 {/* Top Left - Timeline */}
                                 <button 
                                     onClick={() => setActiveSection('timeline')}
-                                    className="w-full h-full bg-white text-slate-400 hover:text-[#cc39a4] transition-all duration-200 hover:-translate-x-1 hover:-translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
                                     style={{
-                                        borderRadius: '90px 5px 5px 5px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                        borderRadius: '40px 12px 12px 12px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
                                     }}
                                 >
-                                    <CalendarDays className="w-8 h-8" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">Timeline</span>
+                                    <CalendarDays className="w-7 h-7 stroke-[1.5]" />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Timeline</span>
                                 </button>
 
                                 {/* Top Right - Evaluations */}
                                 <button 
                                     onClick={() => setActiveSection('evaluations')}
-                                    className="w-full h-full bg-white text-slate-400 hover:text-[#03a9f4] transition-all duration-200 hover:translate-x-1 hover:-translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:translate-x-0.5 hover:-translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
                                     style={{
-                                        borderRadius: '5px 90px 5px 5px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                        borderRadius: '12px 40px 12px 12px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
                                     }}
                                 >
-                                    <CheckSquare className="w-8 h-8" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">Evaluations</span>
+                                    <CheckSquare className="w-7 h-7 stroke-[1.5]" />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Evaluations</span>
                                 </button>
 
                                 {/* Bottom Left - Next Step */}
                                 <button 
                                     onClick={() => setActiveSection('next')}
-                                    className="w-full h-full bg-white text-slate-400 hover:text-[#8c9eff] transition-all duration-200 hover:-translate-x-1 hover:translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:-translate-x-0.5 hover:translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
                                     style={{
-                                        borderRadius: '5px 5px 5px 90px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                        borderRadius: '12px 12px 12px 40px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
                                     }}
                                 >
-                                    <ArrowRight className="w-8 h-8" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">Next</span>
+                                    <ArrowRight className="w-7 h-7 stroke-[1.5]" />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Next</span>
                                 </button>
 
                                 {/* Bottom Right - Documents */}
                                 <button 
                                     onClick={() => setActiveSection('documents')}
-                                    className="w-full h-full bg-white text-slate-400 hover:text-orange-500 transition-all duration-200 hover:translate-x-1 hover:translate-y-1 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
+                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:translate-x-0.5 hover:translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
                                     style={{
-                                        borderRadius: '5px 5px 90px 5px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #4442, 2px 2px 5px #4442'
+                                        borderRadius: '12px 12px 40px 12px',
+                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
                                     }}
                                 >
-                                    <FileText className="w-8 h-8" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">Documents</span>
+                                    <FileText className="w-7 h-7 stroke-[1.5]" />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Documents</span>
                                 </button>
                             </motion.div>
                         )}
