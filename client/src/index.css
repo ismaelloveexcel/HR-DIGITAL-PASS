@@ -123,6 +123,16 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.text-balance {
+  text-wrap: balance;
+}
+
+@supports not (text-wrap: balance) {
+  .text-balance {
+    text-wrap: pretty;
+  }
+}
+
 /* ==========================================================================
    BEM Component Utilities
    ========================================================================== */

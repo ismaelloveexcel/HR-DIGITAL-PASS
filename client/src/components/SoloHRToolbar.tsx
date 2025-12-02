@@ -239,7 +239,7 @@ export function SoloHRToolbar({ className, onEditPass }: SoloHRToolbarProps) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-slate-900 dark:text-white">{action.label}</p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{action.description}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug break-words">{action.description}</p>
                       </div>
                     </motion.button>
                   ))}

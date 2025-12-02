@@ -430,7 +430,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                             <div key={`${doc.name}-${i}`} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 hover:bg-slate-100 transition-colors cursor-pointer">
                                 <FileCheck className="w-4 h-4 text-slate-400 shrink-0" />
                                 <div className="overflow-hidden">
-                                    <p className="text-xs font-semibold text-slate-700 truncate">{doc.name}</p>
+                                    <p className="text-xs font-semibold text-slate-700 break-words leading-snug">{doc.name}</p>
                                     <p className="text-[10px] text-slate-400">{doc.type ?? 'Document'}</p>
                                 </div>
                             </div>
@@ -1012,7 +1012,9 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                               node.status === 'completed' ? 'bg-emerald-400' : node.status === 'current' ? 'bg-[#1E40AF]' : 'bg-slate-200'
                             )}
                           />
-                          <p className="mt-1 text-[9px] font-semibold uppercase tracking-widest text-slate-400 truncate">{node.label}</p>
+                          <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-500 leading-tight whitespace-normal break-words">
+                            {node.label}
+                          </p>
                         </div>
                       ))}
                     </div>
