@@ -206,20 +206,20 @@ export function SoloHRToolbar({ className, onEditPass }: SoloHRToolbarProps) {
             >
               <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
                 {/* Header */}
-                <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-[#1E40AF] dark:bg-blue-500 text-white flex items-center justify-center">
-                      <Menu className="w-4 h-4" />
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-br from-[#1E40AF]/5 to-transparent">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#1E40AF] dark:bg-blue-500 text-white flex items-center justify-center shadow-sm">
+                      <Menu className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">Solo HR Toolkit</h3>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500">Quick actions</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Solo HR</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Quick Actions</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="p-2 space-y-1">
+                <div className="p-3 space-y-2">
                   {actions.map((action, index) => (
                     <motion.button
                       key={action.id}
@@ -228,29 +228,29 @@ export function SoloHRToolbar({ className, onEditPass }: SoloHRToolbarProps) {
                       transition={{ delay: index * 0.05 }}
                       onClick={action.onClick}
                       className={cn(
-                        'w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group',
-                        'hover:scale-[1.02]',
+                        'w-full flex items-center gap-3 p-4 rounded-2xl transition-all text-left group shadow-sm',
+                        'hover:scale-[1.02] hover:shadow-md',
                         action.color,
                         'dark:bg-opacity-20 dark:hover:bg-opacity-30'
                       )}
                     >
-                      <div className="shrink-0">
+                      <div className="shrink-0 w-10 h-10 rounded-xl bg-white/50 dark:bg-white/10 flex items-center justify-center">
                         <action.icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{action.label}</p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug break-words">{action.description}</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{action.label}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-snug break-words mt-0.5">{action.description}</p>
                       </div>
                     </motion.button>
                   ))}
                 </div>
 
                 {/* Footer */}
-                <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-slate-400 dark:text-slate-500 font-medium">Auto-save enabled</span>
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="px-5 py-3.5 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-800/30 border-t border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Auto-save</span>
+                    <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" />
                       Active
                     </span>
                   </div>

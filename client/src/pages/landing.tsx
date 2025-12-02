@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { ArrowRight, Search, ShieldCheck, ClipboardCheck, Clock3, Link2, Layers, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import logo from '@assets/baynunah-logo_1764408063481.png';
 
 type SlotStatus = 'selected' | 'open' | 'hold';
@@ -135,49 +136,51 @@ export default function Landing() {
               Wallet-style passes for every persona
             </div>
 
-            <div className="space-y-5">
-              <h1 className="text-4xl lg:text-5xl font-semibold text-slate-900 leading-tight text-balance">
-                One universal pass that keeps candidates, managers, and onboarding teams perfectly in sync.
+            <div className="space-y-6">
+              <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight tracking-tight">
+                One pass.
+                <br />
+                <span className="text-[#1E40AF]">Every persona.</span>
               </h1>
-              <p className="text-slate-500 text-lg max-w-2xl text-balance">
-                Launch premium, QR-ready passes in seconds. Flip between front/back views, track documents, and broadcast updates without rebuilding UI every time.
+              <p className="text-slate-600 text-xl max-w-2xl leading-relaxed">
+                Premium HR wallet for candidates, managers, and onboarding — all synced in real-time with zero complexity.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="w-full">
               <div className="relative group">
-                <div className="absolute inset-0 rounded-3xl bg-white blur-xl opacity-70 group-hover:opacity-100 transition-opacity" />
-                <div className="relative bg-white rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/50 flex items-center gap-3 p-3">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center">
-                    <Search className="w-5 h-5" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#1E40AF]/20 to-blue-500/20 blur-xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                <div className="relative bg-white rounded-2xl border-2 border-slate-100 group-hover:border-[#1E40AF]/30 shadow-xl shadow-slate-200/50 flex items-center gap-3 p-2 transition-all">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#1E40AF] to-blue-600 text-white flex items-center justify-center shadow-md">
+                    <Search className="w-6 h-6" />
                   </div>
                   <input
                     type="text"
-                    placeholder="Enter access code (e.g. PASS-001)"
-                    className="flex-1 bg-transparent text-slate-900 text-lg font-medium placeholder:text-slate-300 outline-none"
+                    placeholder="Enter your pass code"
+                    className="flex-1 bg-transparent text-slate-900 text-lg font-semibold placeholder:text-slate-400 outline-none"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                   />
                   <button
                     type="submit"
                     disabled={!code}
-                    className="h-12 px-6 rounded-2xl bg-[#1E40AF] text-white font-semibold flex items-center gap-2 hover:bg-blue-900 transition-colors disabled:opacity-40"
+                    className="h-14 px-8 rounded-xl bg-[#1E40AF] text-white font-bold flex items-center gap-2 hover:bg-blue-800 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-900/20"
                   >
                     Unlock
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-5 h-5" />
                   </button>
                 </div>
               </div>
             </form>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/60 space-y-4">
+              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/60 space-y-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Pass playbook</p>
-                    <p className="text-sm text-slate-500">Tap a persona and jump straight to its wallet.</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-400 font-bold mb-1">Pass Playbook</p>
+                    <p className="text-sm text-slate-600">Quick access wallets</p>
                   </div>
-                  <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center">
                     <Layers className="w-5 h-5" />
                   </div>
                 </div>
@@ -186,48 +189,45 @@ export default function Landing() {
                     <button
                       key={pass.code}
                       onClick={() => setLocation(`/pass/${pass.code}`)}
-                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-left hover:border-blue-100 hover:bg-blue-50/40 transition-colors flex items-center justify-between gap-4"
+                      className="w-full rounded-2xl border-2 border-slate-100 hover:border-[#1E40AF] px-5 py-4 text-left hover:bg-blue-50/50 transition-all flex items-center justify-between gap-4 group shadow-sm hover:shadow-md"
                     >
                       <div>
-                        <p className="text-sm font-semibold text-slate-800">{pass.label}</p>
-                        <p className="text-xs text-slate-500 leading-tight">{pass.note} · access code</p>
+                        <p className="text-base font-bold text-slate-800 group-hover:text-[#1E40AF] transition-colors">{pass.label}</p>
+                        <p className="text-xs text-slate-500 leading-tight mt-0.5">{pass.note}</p>
                       </div>
-                      <span className="font-mono text-sm text-slate-600 whitespace-nowrap">{pass.code}</span>
+                      <span className="font-mono text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 group-hover:bg-blue-50 group-hover:text-[#1E40AF] group-hover:border-blue-200 transition-all">{pass.code}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/60 space-y-4">
+              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/60 space-y-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Status board</p>
-                    <p className="text-sm text-slate-500">Live numbers for the pod this week.</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-400 font-bold mb-1">Status Board</p>
+                    <p className="text-sm text-slate-600">Live metrics</p>
                   </div>
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                     <Clock3 className="w-5 h-5" />
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-3 gap-3">
+                <div className="grid sm:grid-cols-3 gap-4">
                   {adminStats.map((stat) => (
-                    <div key={stat.label} className="rounded-2xl bg-slate-50 border border-white p-4">
-                      <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 font-semibold mb-1">{stat.label}</p>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-[#1E40AF]">{stat.value}</span>
-                        <span className="text-[11px] text-slate-500">{stat.detail}</span>
-                      </div>
+                    <div key={stat.label} className="rounded-2xl bg-slate-50 border border-slate-100 p-4 text-center">
+                      <p className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">{stat.label}</p>
+                      <div className="text-4xl font-bold text-[#1E40AF] mb-1">{stat.value}</div>
+                      <p className="text-xs text-slate-500 leading-tight">{stat.detail}</p>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-slate-400">Open the console if you need the data behind any number.</p>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/70 space-y-4">
+            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/70 space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400 font-semibold">Automations live</p>
-                  <p className="text-sm text-slate-500">Admin can toggle fields without touching code.</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400 font-bold mb-1">Module Control</p>
+                  <p className="text-sm text-slate-600">Toggle features instantly</p>
                 </div>
                 <ShieldCheck className="w-6 h-6 text-[#1E40AF]" />
               </div>
@@ -235,13 +235,23 @@ export default function Landing() {
                 {moduleToggles.map((module) => (
                   <div
                     key={module.label}
-                    className={`rounded-2xl border px-4 py-3 flex items-center justify-between text-sm font-semibold ${module.enabled ? 'border-[#1E40AF] text-[#1E40AF] bg-blue-50' : 'border-dashed border-slate-200 text-slate-400 bg-white'}`}
+                    className={cn(
+                      "rounded-2xl border-2 px-4 py-4 flex flex-col gap-1 transition-all shadow-sm",
+                      module.enabled 
+                        ? 'border-[#1E40AF] bg-blue-50' 
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    )}
                   >
-                    <div>
-                      <p>{module.label}</p>
-                      <p className="text-[11px] font-normal text-slate-400">{module.detail}</p>
+                    <div className="flex items-center justify-between">
+                      <p className={cn("text-sm font-bold", module.enabled ? 'text-[#1E40AF]' : 'text-slate-700')}>{module.label}</p>
+                      <span className={cn(
+                        "text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full",
+                        module.enabled ? 'bg-[#1E40AF] text-white' : 'bg-slate-200 text-slate-500'
+                      )}>
+                        {module.enabled ? 'ON' : 'OFF'}
+                      </span>
                     </div>
-                    <span className="text-[10px] uppercase tracking-[0.4em]">{module.enabled ? 'ON' : 'OFF'}</span>
+                    <p className="text-xs text-slate-500">{module.detail}</p>
                   </div>
                 ))}
               </div>
