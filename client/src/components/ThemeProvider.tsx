@@ -22,13 +22,13 @@ function getSystemTheme(): 'light' | 'dark' {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-function getStoredTheme(): Theme {
-  if (typeof window === 'undefined') return 'light';
+function getStoredTheme(): Theme | null {
+  if (typeof window === 'undefined') return null;
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
   if (stored === 'light' || stored === 'dark' || stored === 'system') {
     return stored;
   }
-  return 'light';
+  return null;
 }
 
 interface ThemeProviderProps {
@@ -37,7 +37,7 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(() => getStoredTheme() || defaultTheme);
+  const [theme, setThemeState] = useState<Theme>(() => getStoredTheme() ?? defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => 
     theme === 'system' ? getSystemTheme() : theme
   );

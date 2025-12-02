@@ -583,7 +583,7 @@ export default function CandidateProfile() {
                   </button>
                   <button 
                     onClick={handleImport}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-lg shadow-emerald-900/20"
+                    className="px-4 py-2 rounded-xl bg-emerald-600 dark:bg-emerald-700 text-white text-sm font-medium hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-colors flex items-center gap-2 shadow-lg shadow-emerald-900/20"
                   >
                     <Upload className="w-4 h-4" />
                     Import

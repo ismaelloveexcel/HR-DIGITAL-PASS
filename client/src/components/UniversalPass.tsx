@@ -570,7 +570,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
             >
               {/* FRONT FACE */}
               <div 
-                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-[#ffffff] dark:bg-slate-800 flex flex-col items-center text-center group pass-card"
+                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-white dark:bg-slate-800 flex flex-col items-center text-center group pass-card"
                 style={{ 
                     backfaceVisibility: 'hidden',
                 }}

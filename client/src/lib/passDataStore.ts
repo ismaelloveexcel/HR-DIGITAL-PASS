@@ -53,10 +53,11 @@ function createDefaultStore(): PassDataStore {
 
 function mockUserToCandidate(user: UserData): CandidateWithRelations {
   const now = new Date();
+  const baseId = Date.now();
   
   const timeline: TimelineEntry[] = (user.timeline ?? []).map((item, index) => ({
-    id: -(index + 1),
-    candidateId: -1,
+    id: baseId + index + 1,
+    candidateId: baseId,
     title: item.title,
     date: item.date,
     status: item.status,
@@ -65,8 +66,8 @@ function mockUserToCandidate(user: UserData): CandidateWithRelations {
   }));
 
   const evaluations: Evaluation[] = (user.stats ?? []).map((stat, index) => ({
-    id: -(index + 1),
-    candidateId: -1,
+    id: baseId + 100 + index,
+    candidateId: baseId,
     type: stat.label,
     score: stat.value,
     notes: '',
@@ -77,16 +78,16 @@ function mockUserToCandidate(user: UserData): CandidateWithRelations {
 
   const documents: Document[] = [
     {
-      id: -1,
-      candidateId: -1,
+      id: baseId + 200,
+      candidateId: baseId,
       title: 'Universal Brief',
       type: 'Summary',
       url: '#',
       uploadedAt: now,
     },
     {
-      id: -2,
-      candidateId: -1,
+      id: baseId + 201,
+      candidateId: baseId,
       title: 'Latest Update',
       type: 'Note',
       url: '#',
@@ -95,7 +96,7 @@ function mockUserToCandidate(user: UserData): CandidateWithRelations {
   ];
 
   return {
-    id: -1,
+    id: baseId,
     code: user.code,
     name: user.name,
     title: user.title,
