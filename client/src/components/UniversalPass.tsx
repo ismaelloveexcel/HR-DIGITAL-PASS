@@ -383,10 +383,10 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                         )}
                     </div>
 
-                    {/* Recruitment Status Widget - Reveals on Hover */}
+                    {/* Recruitment Status Widget - Always visible on mobile, reveals on hover on desktop */}
                     <div className="w-full mt-auto relative">
-                        {/* Hidden Container */}
-                        <div className="overflow-hidden max-h-0 opacity-0 group-hover:max-h-[140px] group-hover:opacity-100 transition-all duration-500 ease-out">
+                        {/* Container: visible on mobile, hover-reveal on desktop */}
+                        <div className="overflow-hidden max-h-[140px] opacity-100 md:max-h-0 md:opacity-0 md:group-hover:max-h-[140px] md:group-hover:opacity-100 transition-all duration-500 ease-out">
                             <div 
                                 className="pt-4 border-t border-slate-100 hover:bg-slate-50 transition-colors rounded-xl p-2 cursor-pointer" 
                                 onClick={() => setLocation('/candidate-profile')}
@@ -395,21 +395,22 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                                     <div className="flex flex-col text-left">
                                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Recruitment Stage</span>
                                         <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide flex items-center gap-1">
-                                            Interview
+                                            {candidate.timeline.find(t => t.status === 'current')?.title || 'In Progress'}
                                             <ChevronRight className="w-3 h-3 text-slate-300 hover:text-[#1E40AF] transition-colors" />
                                         </span>
                                     </div>
-                                    <span className="text-[9px] font-medium text-slate-400">Step 4 of 6</span>
+                                    <span className="text-[9px] font-medium text-slate-400">
+                                        Step {candidate.timeline.findIndex(t => t.status === 'current') + 1} of {candidate.timeline.length}
+                                    </span>
                                 </div>
                                 
                                 <div className="flex gap-1 h-1.5 w-full">
-                                    {['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'].map((stage, i) => {
-                                        const currentStageIndex = 3;
-                                        const isActive = i === currentStageIndex;
-                                        const isCompleted = i < currentStageIndex;
+                                    {candidate.timeline.map((stage, i) => {
+                                        const isActive = stage.status === 'current';
+                                        const isCompleted = stage.status === 'completed';
                                         return (
                                             <div 
-                                                key={stage} 
+                                                key={stage.id} 
                                                 className={cn(
                                                     "h-full rounded-full flex-1 transition-colors",
                                                     isActive ? "bg-[#1E40AF]" : 
@@ -423,8 +424,8 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                             </div>
                         </div>
                         
-                        {/* Handle Indicator (Visible when hidden) */}
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-200 rounded-full opacity-100 group-hover:opacity-0 transition-opacity duration-300 delay-100" />
+                        {/* Handle Indicator (Hidden on mobile, visible on desktop when widget is hidden) */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-200 rounded-full hidden md:block md:opacity-100 md:group-hover:opacity-0 transition-opacity duration-300 delay-100" />
                     </div>
                 </div>
               </div>
