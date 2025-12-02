@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { ArrowRight, Search } from 'lucide-react';
+import { ArrowRight, Search, ShieldCheck, ClipboardCheck, Clock3 } from 'lucide-react';
 import logo from '@assets/baynunah-logo_1764408063481.png';
 
 export default function Landing() {
@@ -14,6 +14,18 @@ export default function Landing() {
       setLocation(`/pass/${code.trim().toUpperCase()}`);
     }
   };
+
+  const adminStats = [
+    { label: 'Active passes', value: '03', detail: 'Candidate · Manager · Onboarding' },
+    { label: 'Tasks queued', value: '05', detail: 'Interviews • Docs • Offers' },
+    { label: 'Starts this week', value: '01', detail: 'Prep onboarding kit' },
+  ];
+
+  const soloChecklist = [
+    'Share the latest pass link before each touchpoint',
+    'Log documents within 5 minutes of receiving them',
+    'Send onboarding welcome pack 48h before start',
+  ];
 
   return (
     <div className="min-h-screen bg-subtle flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -73,6 +85,62 @@ export default function Landing() {
             <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">ONB-001</span>
           </button>
         </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-10 w-full space-y-4"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {adminStats.map((stat) => (
+              <div key={stat.label} className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-[0.3em] mb-2">{stat.label}</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-[#1E40AF]">{stat.value}</span>
+                  <span className="text-[11px] text-slate-400">{stat.detail}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-100 p-5 shadow-lg shadow-slate-200/40 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">Solo HR Toolkit</p>
+                <h3 className="text-lg font-semibold text-slate-900">Stay ahead with one tap</h3>
+              </div>
+            </div>
+
+            <ul className="space-y-2">
+              {soloChecklist.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-slate-500">
+                  <div className="w-6 h-6 rounded-full bg-slate-50 text-[#1E40AF] flex items-center justify-center shrink-0">
+                    <ClipboardCheck className="w-4 h-4" />
+                  </div>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <Clock3 className="w-4 h-4 text-slate-400" />
+                <span>Next check-in reminder · 09:30</span>
+              </div>
+              <button
+                onClick={() => setLocation('/candidate-profile')}
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#1E40AF] text-white text-sm font-semibold shadow-md shadow-blue-900/20 hover:bg-blue-800 transition-colors flex items-center justify-center gap-2"
+              >
+                Open Candidate Console
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
 
       <div className="absolute bottom-6 text-center w-full">
