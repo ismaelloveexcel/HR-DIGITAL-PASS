@@ -343,15 +343,15 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans bg-[#ffffffde]">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans bg-[#ffffffde] dark:bg-slate-900">
       {/* Live Time Indicator */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="absolute top-8 right-8 text-right z-10"
       >
-        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Local Time</p>
-        <p className="text-sm font-mono text-slate-600">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+        <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">Local Time</p>
+        <p className="text-sm font-mono text-slate-600 dark:text-slate-300">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
       <AnimatePresence>
         {showVerification && (
@@ -360,49 +360,49 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/10 backdrop-blur-md font-semibold"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/10 dark:bg-slate-900/50 backdrop-blur-md font-semibold"
           >
-             <div className="w-full max-w-[320px] rounded-[24px] p-4 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] text-[#000000] flex flex-col bg-[#ffffff]">
+             <div className="w-full max-w-[320px] rounded-[24px] p-4 relative overflow-hidden shadow-[0_0_100px_rgba(44,65,172,0.4)] text-[#000000] dark:text-white flex flex-col bg-[#ffffff] dark:bg-slate-800">
                 <button 
                   onClick={() => setShowVerification(false)}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10"
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 dark:bg-slate-700 flex items-center justify-center hover:bg-white/20 dark:hover:bg-slate-600 transition-colors z-10"
                 >
                   <span className="text-xl font-light text-slate-400">&times;</span>
                 </button>
 
                 <div className="flex flex-col items-center text-center pt-2 pb-2">
-                   <h2 className="text-lg font-bold tracking-tight mb-0.5 text-[#1E40AF] shrink-0">Verification Code</h2>
-                   <p className="mb-3 shrink-0 text-slate-500 text-xs font-medium">Scan QR code or enter manually</p>
+                   <h2 className="text-lg font-bold tracking-tight mb-0.5 text-[#1E40AF] dark:text-blue-400 shrink-0">Verification Code</h2>
+                   <p className="mb-3 shrink-0 text-slate-500 dark:text-slate-400 text-xs font-medium">Scan QR code or enter manually</p>
 
                    <div 
-                    className="bg-white p-3 rounded-2xl w-40 aspect-square flex items-center justify-center mb-3 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50 cursor-pointer hover:scale-105 transition-transform"
+                    className="bg-white dark:bg-slate-700 p-3 rounded-2xl w-40 aspect-square flex items-center justify-center mb-3 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 shrink-0 border border-slate-50 dark:border-slate-600 cursor-pointer hover:scale-105 transition-transform"
                     onClick={() => setLocation('/candidate-profile')}
                    >
                       <QRCodeSVG value={`https://baynunah-pass.com/verify/${candidate.code}`} size={130} fgColor="#1e293b" />
                    </div>
 
-                   <p className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold mb-2 shrink-0">OR enter code</p>
+                   <p className="text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2 shrink-0">OR enter code</p>
 
-                   <div className="w-full rounded-xl p-2.5 flex items-center justify-center relative mb-3 border border-slate-100 text-slate-700 bg-slate-50/80 shrink-0 shadow-inner">
+                   <div className="w-full rounded-xl p-2.5 flex items-center justify-center relative mb-3 border border-slate-100 dark:border-slate-600 text-slate-700 dark:text-slate-200 bg-slate-50/80 dark:bg-slate-700/80 shrink-0 shadow-inner">
                       <span className="font-mono tracking-[0.2em] text-base font-bold">N8EC-PS5D-9PKD</span>
-                      <button className="absolute right-3 text-slate-400 hover:text-[#1E40AF] transition-colors">
+                      <button className="absolute right-3 text-slate-400 hover:text-[#1E40AF] dark:hover:text-blue-400 transition-colors">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
                    </div>
 
                    <div className="mb-3 shrink-0 space-y-0">
-                      <h3 className="text-[#1E40AF] text-base font-bold tracking-tight">{candidate.name}</h3>
-                      <p className="text-slate-500 font-mono text-[10px] tracking-wider">{candidate.code}</p>
+                      <h3 className="text-[#1E40AF] dark:text-blue-400 text-base font-bold tracking-tight">{candidate.name}</h3>
+                      <p className="text-slate-500 dark:text-slate-400 font-mono text-[10px] tracking-wider">{candidate.code}</p>
                    </div>
 
-                   <div className="w-full h-px bg-slate-100 mb-3 shrink-0" />
+                   <div className="w-full h-px bg-slate-100 dark:bg-slate-700 mb-3 shrink-0" />
 
                    <button 
                      onClick={() => {
                        setShowVerification(false);
                        setLocation('/candidate-profile');
                      }}
-                     className="w-full py-2.5 rounded-xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all flex items-center justify-center gap-2 text-xs bg-slate-50 text-slate-600 hover:text-[#1E40AF] font-semibold shrink-0 group"
+                     className="w-full py-2.5 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 border border-transparent hover:border-blue-100 dark:hover:border-blue-800 transition-all flex items-center justify-center gap-2 text-xs bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#1E40AF] dark:hover:text-blue-400 font-semibold shrink-0 group"
                    >
                      <span className="group-hover:translate-x-[-2px] transition-transform">View Full Profile</span>
                      <svg className="group-hover:translate-x-[2px] transition-transform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -420,18 +420,18 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-md"
+            className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-slate-900/20 dark:bg-slate-900/60 backdrop-blur-md"
           >
-            <div className="w-full max-w-2xl bg-white rounded-[32px] shadow-[0_20px_80px_rgba(15,23,42,0.15)] border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between gap-6">
+            <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-[32px] shadow-[0_20px_80px_rgba(15,23,42,0.15)] dark:shadow-[0_20px_80px_rgba(0,0,0,0.4)] border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between gap-6">
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Solo HR Console</p>
-                  <h3 className="text-xl font-semibold text-slate-900 mt-1">{personaCopy.badge}</h3>
-                  <p className="text-sm text-slate-500">{personaCopy.caption}</p>
+                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Solo HR Console</p>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-1">{personaCopy.badge}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{personaCopy.caption}</p>
                 </div>
                 <button
                   onClick={() => setShowAdminPanel(false)}
-                  className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center justify-center"
                 >
                   <span className="text-xl">&times;</span>
                 </button>
@@ -439,27 +439,27 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
 
               <div className="p-6 space-y-6 overflow-y-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50">
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Workload</p>
-                    <p className="text-3xl font-bold text-[#1E40AF]">{workloadScore}%</p>
-                    <p className="text-[11px] text-slate-500 mt-1">Confidence to stay on track</p>
+                  <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/50">
+                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Workload</p>
+                    <p className="text-3xl font-bold text-[#1E40AF] dark:text-blue-400">{workloadScore}%</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Confidence to stay on track</p>
                   </div>
-                  <div className="p-4 rounded-2xl border border-slate-100 bg-white">
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Stages</p>
-                    <p className="text-sm text-slate-600">{timelineStats.completed} done · {timelineStats.current} active</p>
-                    <p className="text-[11px] text-slate-400">Next: {nextStage?.title ?? 'All caught up'}</p>
+                  <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Stages</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300">{timelineStats.completed} done · {timelineStats.current} active</p>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500">Next: {nextStage?.title ?? 'All caught up'}</p>
                   </div>
-                  <div className="p-4 rounded-2xl border border-slate-100 bg-white">
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Docs & Notes</p>
-                    <p className="text-sm text-slate-600">{candidate.documents.length} uploaded · {outstandingDocs} outstanding</p>
-                    <p className="text-[11px] text-slate-400">Evaluations: {candidate.evaluations.length}</p>
+                  <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Docs & Notes</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300">{candidate.documents.length} uploaded · {outstandingDocs} outstanding</p>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500">Evaluations: {candidate.evaluations.length}</p>
                   </div>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Action Queue</p>
-                    <span className="text-[10px] font-semibold text-slate-400">Tap to mark progress</span>
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">Action Queue</p>
+                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">Tap to mark progress</span>
                   </div>
                   <div className="space-y-3">
                     {adminActions.map((action) => (
@@ -467,24 +467,24 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                         key={action.label}
                         className={cn(
                           "w-full text-left p-4 rounded-2xl border flex items-start gap-3 transition-all",
-                          action.tone === 'priority' ? "border-[#1E40AF] bg-blue-50/50 text-[#1E2A4A]" :
-                          action.tone === 'attention' ? "border-amber-200 bg-amber-50 text-amber-700" :
-                          "border-slate-100 bg-white text-slate-600 hover:border-slate-200"
+                          action.tone === 'priority' ? "border-[#1E40AF] dark:border-blue-500 bg-blue-50/50 dark:bg-blue-900/30 text-[#1E2A4A] dark:text-blue-200" :
+                          action.tone === 'attention' ? "border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300" :
+                          "border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-200 dark:hover:border-slate-600"
                         )}
                       >
                         <div className="w-2 h-2 rounded-full mt-1 shrink-0" style={{ backgroundColor: action.tone === 'priority' ? '#1E40AF' : action.tone === 'attention' ? '#f97316' : '#94a3b8' }} />
                         <div className="flex-1">
                           <p className="text-sm font-semibold">{action.label}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{action.detail}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{action.detail}</p>
                         </div>
-                        <CheckCircle2 className={cn("w-4 h-4", action.tone === 'priority' ? "text-[#1E40AF]" : "text-slate-300")} />
+                        <CheckCircle2 className={cn("w-4 h-4", action.tone === 'priority' ? "text-[#1E40AF] dark:text-blue-400" : "text-slate-300 dark:text-slate-600")} />
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mb-3">Maintenance</p>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] mb-3">Maintenance</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                       {
@@ -509,15 +509,15 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                         className={cn(
                           "p-4 rounded-2xl border text-left space-y-2 transition-all",
                           maintenancePrefs[option.key]
-                            ? "border-[#1E40AF] bg-blue-50/70 text-[#1E2A4A]"
-                            : "border-slate-100 bg-white text-slate-500 hover:border-slate-200"
+                            ? "border-[#1E40AF] dark:border-blue-500 bg-blue-50/70 dark:bg-blue-900/30 text-[#1E2A4A] dark:text-blue-200"
+                            : "border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600"
                         )}
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold">{option.label}</span>
                           <span className={cn(
                             "text-[10px] font-bold uppercase tracking-widest",
-                            maintenancePrefs[option.key] ? "text-[#1E40AF]" : "text-slate-400"
+                            maintenancePrefs[option.key] ? "text-[#1E40AF] dark:text-blue-400" : "text-slate-400 dark:text-slate-500"
                           )}>
                             {maintenancePrefs[option.key] ? "ON" : "OFF"}
                           </span>
@@ -570,10 +570,9 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
             >
               {/* FRONT FACE */}
               <div 
-                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-[#ffffff] flex flex-col items-center text-center group"
+                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-[#ffffff] dark:bg-slate-800 flex flex-col items-center text-center group pass-card"
                 style={{ 
                     backfaceVisibility: 'hidden',
-                    boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
                 }}
               >
                 {/* Admin Console Button */}
@@ -582,7 +581,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                     e.stopPropagation();
                     setShowAdminPanel(true);
                   }}
-                  className="absolute top-6 left-6 p-2 rounded-full text-slate-400 hover:text-[#1E40AF] hover:bg-blue-50 transition-colors z-20"
+                  className="absolute top-6 left-6 p-2 rounded-full text-slate-400 dark:text-slate-500 hover:text-[#1E40AF] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors z-20"
                 >
                   <ShieldCheck className="w-4 h-4" />
                 </button>
@@ -590,7 +589,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                 {/* Flip Button */}
                 <button 
                   onClick={toggleFlip}
-                  className="absolute top-6 right-6 p-2 rounded-full text-slate-400 hover:text-[#1E40AF] hover:bg-blue-50 transition-colors z-20"
+                  className="absolute top-6 right-6 p-2 rounded-full text-slate-400 dark:text-slate-500 hover:text-[#1E40AF] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors z-20"
                 >
                   <RotateCw className="w-4 h-4" />
                 </button>
@@ -601,30 +600,30 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                 <div className="flex flex-col items-center w-full h-full pt-4">
                     {/* Logo */}
                     <div className="h-6 mb-4 flex items-center justify-center w-full">
-                        <img src={logo} alt="Baynunah" className="h-full object-contain invert opacity-80" />
+                        <img src={logo} alt="Baynunah" className="h-full object-contain invert dark:invert-0 opacity-80" />
                     </div>
 
                     {/* Pass Type */}
                     <div className="flex flex-col items-center gap-2 mb-8">
-                        <p className="tracking-[0.2em] uppercase font-medium text-[14px] text-[#62748e]">
+                        <p className="tracking-[0.2em] uppercase font-medium text-[14px] text-[#62748e] dark:text-slate-400">
                             {getPassType()}
                         </p>
-                        <span className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+                        <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
                             {personaCopy.badge}
                         </span>
-                        <p className={cn("text-[10px] font-medium max-w-[220px] leading-snug", personaCopy.accent)}>
+                        <p className={cn("text-[10px] font-medium max-w-[220px] leading-snug", personaCopy.accent, "dark:opacity-80")}>
                             {personaCopy.caption}
                         </p>
                     </div>
 
                     {/* QR Code Area */}
                     <div className="relative flex flex-col items-center group/qr cursor-pointer mb-8" onClick={() => setShowVerification(true)}>
-                        <div className="w-48 h-48 relative flex items-center justify-center group-hover/qr:scale-105 transition-transform duration-300 bg-white rounded-3xl shadow-[inset_2px_2px_5px_#d1d9e6,inset_-2px_-2px_5px_#ffffff] p-4">
+                        <div className="w-48 h-48 relative flex items-center justify-center group-hover/qr:scale-105 transition-transform duration-300 bg-white dark:bg-slate-700 rounded-3xl pass-card__qr p-4">
                              {/* Corner Brackets */}
-                             <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-slate-300 rounded-tl-lg" />
-                             <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-slate-300 rounded-tr-lg" />
-                             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-slate-300 rounded-bl-lg" />
-                             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-slate-300 rounded-br-lg" />
+                             <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-slate-300 dark:border-slate-500 rounded-tl-lg" />
+                             <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-slate-300 dark:border-slate-500 rounded-tr-lg" />
+                             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-slate-300 dark:border-slate-500 rounded-bl-lg" />
+                             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-slate-300 dark:border-slate-500 rounded-br-lg" />
 
                              {/* Subtle Scan Animation */}
                              <motion.div 
@@ -641,18 +640,18 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                             />
                         </div>
                         
-                        <div className="absolute -bottom-3 bg-white px-4 py-1 rounded-full shadow-sm border border-slate-100 flex items-center gap-1.5">
+                        <div className="absolute -bottom-3 bg-white dark:bg-slate-700 px-4 py-1 rounded-full shadow-sm border border-slate-100 dark:border-slate-600 flex items-center gap-1.5">
                             <span className={cn("w-1.5 h-1.5 rounded-full", candidate.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{candidate.status}</span>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{candidate.status}</span>
                         </div>
                     </div>
 
                     {/* Identity */}
                     <div className="space-y-1 mb-6">
-                        <h1 className="text-2xl font-bold tracking-tight text-[#1E40AF]">{candidate.name}</h1>
-                        <p className="text-slate-500 font-medium text-xs uppercase tracking-wider">{candidate.title}</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-[#1E40AF] dark:text-blue-400">{candidate.name}</h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{candidate.title}</p>
                         {candidate.department && (
-                            <p className="text-slate-400 text-[10px] font-medium mt-1">{candidate.department}</p>
+                            <p className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1">{candidate.department}</p>
                         )}
                     </div>
 
@@ -665,7 +664,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                               window.open(`tel:${candidate.phone}`, '_self');
                             }
                           }}
-                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-[12px] font-semibold text-slate-500 hover:border-blue-100 hover:text-[#1E40AF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-[12px] font-semibold text-slate-500 dark:text-slate-400 hover:border-blue-100 dark:hover:border-blue-700 hover:text-[#1E40AF] dark:hover:text-blue-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           Call
                         </button>
@@ -676,19 +675,19 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                               window.open(`mailto:${candidate.email}?subject=Baynunah Pass Update`, '_self');
                             }
                           }}
-                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-[12px] font-semibold text-slate-500 hover:border-blue-100 hover:text-[#1E40AF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-[12px] font-semibold text-slate-500 dark:text-slate-400 hover:border-blue-100 dark:hover:border-blue-700 hover:text-[#1E40AF] dark:hover:text-blue-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           Email
                         </button>
                         <button
                           onClick={() => setLocation('/candidate-profile')}
-                          className="flex-1 px-3 py-2 rounded-xl border border-[#1E40AF]/20 bg-[#1E40AF]/10 text-[12px] font-semibold text-[#1E40AF] hover:bg-[#1E40AF]/20 transition-colors"
+                          className="flex-1 px-3 py-2 rounded-xl border border-[#1E40AF]/20 dark:border-blue-500/30 bg-[#1E40AF]/10 dark:bg-blue-500/20 text-[12px] font-semibold text-[#1E40AF] dark:text-blue-400 hover:bg-[#1E40AF]/20 dark:hover:bg-blue-500/30 transition-colors"
                         >
                           Profile
                         </button>
                     </div>
 
-                    <p className="text-[11px] text-slate-400 mb-4 max-w-[240px]">
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-4 max-w-[240px]">
                       {soloTip}
                     </p>
 
