@@ -16,11 +16,13 @@ import {
   Settings,
   CheckCircle2,
   AlertCircle,
+  Sliders,
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { usePassData } from '@/hooks/usePassData';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { AdminControlCenter } from './AdminControlCenter';
 
 interface SoloHRToolbarProps {
   className?: string;
@@ -29,6 +31,7 @@ interface SoloHRToolbarProps {
 
 export function SoloHRToolbar({ className, onEditPass }: SoloHRToolbarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const { resolvedTheme, toggleTheme } = useTheme();
   const { downloadData, uploadData, reset, lastSaved } = usePassData();
   const { toast } = useToast();
@@ -88,7 +91,20 @@ export function SoloHRToolbar({ className, onEditPass }: SoloHRToolbarProps) {
     });
   };
 
+  const handleOpenAdmin = () => {
+    setIsOpen(false);
+    setIsAdminOpen(true);
+  };
+
   const actions = [
+    {
+      id: 'control-center',
+      icon: Sliders,
+      label: 'Control Center',
+      description: 'Manage candidates, stages, and settings',
+      onClick: handleOpenAdmin,
+      color: 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100',
+    },
     {
       id: 'export',
       icon: Download,
@@ -260,6 +276,12 @@ export function SoloHRToolbar({ className, onEditPass }: SoloHRToolbarProps) {
           </>
         )}
       </AnimatePresence>
+
+      {/* Admin Control Center */}
+      <AdminControlCenter 
+        isOpen={isAdminOpen} 
+        onClose={() => setIsAdminOpen(false)} 
+      />
     </>
   );
 }
