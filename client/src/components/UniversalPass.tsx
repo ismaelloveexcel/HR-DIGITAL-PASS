@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
@@ -32,6 +32,9 @@ import { useLocation } from 'wouter';
 interface UniversalPassProps {
   candidate: CandidateWithRelations;
 }
+
+type Persona = 'candidate' | 'manager' | 'onboarding';
+type MaintenanceKey = 'reminders' | 'docs' | 'broadcast';
 
 // Data for the back of the card
 const CANDIDATE_BACK_DATA = {
@@ -85,7 +88,16 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showVerification, setShowVerification] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [maintenancePrefs, setMaintenancePrefs] = useState<Record<MaintenanceKey, boolean>>({
+    reminders: true,
+    docs: true,
+    broadcast: false,
+  });
   const [, setLocation] = useLocation();
+  const toggleMaintenancePref = (key: MaintenanceKey) => {
+    setMaintenancePrefs((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -98,6 +110,108 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     setIsFlipped(false);
     setActiveSection(null);
   }, [candidate.code]);
+
+  const persona: Persona = useMemo(() => {
+    if (candidate.code.startsWith('REQ')) return 'manager';
+    if (candidate.code.startsWith('ONB')) return 'onboarding';
+    return 'candidate';
+  }, [candidate.code]);
+
+  const personaMeta: Record<Persona, { badge: string; caption: string; accent: string }> = {
+    candidate: {
+      badge: 'Candidate Journey',
+      caption: 'Share progress updates instantly.',
+      accent: 'text-[#1E40AF]',
+    },
+    manager: {
+      badge: 'Hiring Manager Brief',
+      caption: 'Keep leadership synced without extra decks.',
+      accent: 'text-emerald-600',
+    },
+    onboarding: {
+      badge: 'Onboarding Checklist',
+      caption: 'Make day-one ready in a glance.',
+      accent: 'text-amber-600',
+    },
+  };
+
+  const personaCopy = personaMeta[persona];
+
+  const timelineStats = useMemo(() => {
+    return candidate.timeline.reduce(
+      (acc, item) => {
+        if (item.status === 'completed') acc.completed += 1;
+        else if (item.status === 'current') acc.current += 1;
+        else acc.upcoming += 1;
+        return acc;
+      },
+      { completed: 0, current: 0, upcoming: 0 }
+    );
+  }, [candidate.timeline]);
+
+  const currentStage = useMemo(
+    () => candidate.timeline.find((t) => t.status === 'current'),
+    [candidate.timeline]
+  );
+
+  const nextStage = useMemo(
+    () => candidate.timeline.find((t) => t.status === 'upcoming'),
+    [candidate.timeline]
+  );
+
+  const outstandingDocs = Math.max(0, (persona === 'onboarding' ? 5 : 2) - candidate.documents.length);
+
+  const workloadScore = useMemo(() => {
+    const base = timelineStats.current * 20 + timelineStats.upcoming * 10;
+    const docPenalty = outstandingDocs * 8;
+    const evaluationLift = candidate.evaluations.length * 5;
+    const personaBoost = persona === 'onboarding' ? 10 : persona === 'manager' ? 5 : 0;
+    return Math.min(100, 45 + base + evaluationLift - docPenalty + personaBoost);
+  }, [timelineStats, outstandingDocs, candidate.evaluations.length, persona]);
+
+  const adminActions = useMemo(() => {
+    const actions: { label: string; detail: string; tone: 'priority' | 'reminder' | 'attention' | 'routine' }[] = [];
+    if (currentStage) {
+      actions.push({
+        label: `Prep ${currentStage.title}`,
+        detail: currentStage.date ? `Align panel before ${currentStage.date}` : 'Confirm timing with stakeholders',
+        tone: 'priority',
+      });
+    }
+    if (nextStage) {
+      actions.push({
+        label: `Block calendar for ${nextStage.title}`,
+        detail: nextStage.date ? `Target date ${nextStage.date}` : 'Schedule next milestone',
+        tone: 'reminder',
+      });
+    }
+    if (candidate.documents.length < (persona === 'onboarding' ? 4 : 2)) {
+      actions.push({
+        label: 'Request missing documents',
+        detail: 'Send secure upload link to candidate',
+        tone: 'attention',
+      });
+    }
+    actions.push({
+      label: 'Share universal pass update',
+      detail: 'Keep leadership in the loop with one link',
+      tone: 'routine',
+    });
+    return actions;
+  }, [currentStage, nextStage, candidate.documents.length, persona]);
+
+  const canCall = Boolean(candidate.phone);
+  const canEmail = Boolean(candidate.email);
+
+  const soloTip = useMemo(() => {
+    if (persona === 'manager') {
+      return 'Log one concise update after each interview to keep managers aligned without extra calls.';
+    }
+    if (persona === 'onboarding') {
+      return 'Schedule equipment, access, and first-day buddy at least 48 hours before start.';
+    }
+    return 'Send micro-updates after every milestone so candidates feel guided even with a lean HR team.';
+  }, [persona]);
 
   const toggleExpand = () => setExpanded(!expanded);
   const toggleFlip = (e?: React.MouseEvent) => {
@@ -239,7 +353,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
         <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Local Time</p>
         <p className="text-sm font-mono text-slate-600">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       </motion.div>
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {showVerification && (
           <motion.div
             key="verification"
@@ -297,7 +411,147 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
              </div>
           </motion.div>
         )}
+      </AnimatePresence>
 
+      <AnimatePresence>
+        {showAdminPanel && (
+          <motion.div
+            key="admin-panel"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-md"
+          >
+            <div className="w-full max-w-2xl bg-white rounded-[32px] shadow-[0_20px_80px_rgba(15,23,42,0.15)] border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between gap-6">
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Solo HR Console</p>
+                  <h3 className="text-xl font-semibold text-slate-900 mt-1">{personaCopy.badge}</h3>
+                  <p className="text-sm text-slate-500">{personaCopy.caption}</p>
+                </div>
+                <button
+                  onClick={() => setShowAdminPanel(false)}
+                  className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors flex items-center justify-center"
+                >
+                  <span className="text-xl">&times;</span>
+                </button>
+              </div>
+
+              <div className="p-6 space-y-6 overflow-y-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Workload</p>
+                    <p className="text-3xl font-bold text-[#1E40AF]">{workloadScore}%</p>
+                    <p className="text-[11px] text-slate-500 mt-1">Confidence to stay on track</p>
+                  </div>
+                  <div className="p-4 rounded-2xl border border-slate-100 bg-white">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Stages</p>
+                    <p className="text-sm text-slate-600">{timelineStats.completed} done · {timelineStats.current} active</p>
+                    <p className="text-[11px] text-slate-400">Next: {nextStage?.title ?? 'All caught up'}</p>
+                  </div>
+                  <div className="p-4 rounded-2xl border border-slate-100 bg-white">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Docs & Notes</p>
+                    <p className="text-sm text-slate-600">{candidate.documents.length} uploaded · {outstandingDocs} outstanding</p>
+                    <p className="text-[11px] text-slate-400">Evaluations: {candidate.evaluations.length}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em]">Action Queue</p>
+                    <span className="text-[10px] font-semibold text-slate-400">Tap to mark progress</span>
+                  </div>
+                  <div className="space-y-3">
+                    {adminActions.map((action) => (
+                      <button
+                        key={action.label}
+                        className={cn(
+                          "w-full text-left p-4 rounded-2xl border flex items-start gap-3 transition-all",
+                          action.tone === 'priority' ? "border-[#1E40AF] bg-blue-50/50 text-[#1E2A4A]" :
+                          action.tone === 'attention' ? "border-amber-200 bg-amber-50 text-amber-700" :
+                          "border-slate-100 bg-white text-slate-600 hover:border-slate-200"
+                        )}
+                      >
+                        <div className="w-2 h-2 rounded-full mt-1 shrink-0" style={{ backgroundColor: action.tone === 'priority' ? '#1E40AF' : action.tone === 'attention' ? '#f97316' : '#94a3b8' }} />
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold">{action.label}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{action.detail}</p>
+                        </div>
+                        <CheckCircle2 className={cn("w-4 h-4", action.tone === 'priority' ? "text-[#1E40AF]" : "text-slate-300")} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mb-3">Maintenance</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      {
+                        key: 'reminders' as MaintenanceKey,
+                        label: 'Timeline nudges',
+                        description: 'Auto reminders 30 min before events',
+                      },
+                      {
+                        key: 'docs' as MaintenanceKey,
+                        label: 'Document sync',
+                        description: 'Notify when uploads arrive',
+                      },
+                      {
+                        key: 'broadcast' as MaintenanceKey,
+                        label: 'Broadcast updates',
+                        description: 'Send pass digest to leaders',
+                      },
+                    ].map((option) => (
+                      <button
+                        key={option.key}
+                        onClick={() => toggleMaintenancePref(option.key)}
+                        className={cn(
+                          "p-4 rounded-2xl border text-left space-y-2 transition-all",
+                          maintenancePrefs[option.key]
+                            ? "border-[#1E40AF] bg-blue-50/70 text-[#1E2A4A]"
+                            : "border-slate-100 bg-white text-slate-500 hover:border-slate-200"
+                        )}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold">{option.label}</span>
+                          <span className={cn(
+                            "text-[10px] font-bold uppercase tracking-widest",
+                            maintenancePrefs[option.key] ? "text-[#1E40AF]" : "text-slate-400"
+                          )}>
+                            {maintenancePrefs[option.key] ? "ON" : "OFF"}
+                          </span>
+                        </div>
+                        <p className="text-xs">{option.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => {
+                      setShowAdminPanel(false);
+                      setLocation('/candidate-profile');
+                    }}
+                    className="flex-1 py-3 rounded-2xl bg-[#1E40AF] text-white font-semibold text-sm shadow-lg shadow-blue-900/25 hover:bg-blue-800 transition-colors"
+                  >
+                    Open Candidate Console
+                  </button>
+                  <button
+                    onClick={() => setShowAdminPanel(false)}
+                    className="flex-1 py-3 rounded-2xl bg-slate-100 text-slate-600 font-semibold text-sm hover:bg-slate-200 transition-colors"
+                  >
+                    Keep Managing
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
         {!expanded ? (
           <motion.div 
             key="compact"
@@ -322,6 +576,17 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                     boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
                 }}
               >
+                {/* Admin Console Button */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAdminPanel(true);
+                  }}
+                  className="absolute top-6 left-6 p-2 rounded-full text-slate-400 hover:text-[#1E40AF] hover:bg-blue-50 transition-colors z-20"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                </button>
+
                 {/* Flip Button */}
                 <button 
                   onClick={toggleFlip}
@@ -340,9 +605,17 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                     </div>
 
                     {/* Pass Type */}
-                    <p className="tracking-[0.2em] uppercase font-medium text-[14px] text-[#62748e] mb-8">
-                        {getPassType()}
-                    </p>
+                    <div className="flex flex-col items-center gap-2 mb-8">
+                        <p className="tracking-[0.2em] uppercase font-medium text-[14px] text-[#62748e]">
+                            {getPassType()}
+                        </p>
+                        <span className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+                            {personaCopy.badge}
+                        </span>
+                        <p className={cn("text-[10px] font-medium max-w-[220px] leading-snug", personaCopy.accent)}>
+                            {personaCopy.caption}
+                        </p>
+                    </div>
 
                     {/* QR Code Area */}
                     <div className="relative flex flex-col items-center group/qr cursor-pointer mb-8" onClick={() => setShowVerification(true)}>
@@ -382,6 +655,42 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                             <p className="text-slate-400 text-[10px] font-medium mt-1">{candidate.department}</p>
                         )}
                     </div>
+
+                    {/* Solo Admin Shortcuts */}
+                    <div className="w-full flex items-center justify-center gap-2 mb-6">
+                        <button
+                          disabled={!canCall}
+                          onClick={() => {
+                            if (canCall && typeof window !== 'undefined') {
+                              window.open(`tel:${candidate.phone}`, '_self');
+                            }
+                          }}
+                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-[12px] font-semibold text-slate-500 hover:border-blue-100 hover:text-[#1E40AF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          Call
+                        </button>
+                        <button
+                          disabled={!canEmail}
+                          onClick={() => {
+                            if (canEmail && typeof window !== 'undefined') {
+                              window.open(`mailto:${candidate.email}?subject=Baynunah Pass Update`, '_self');
+                            }
+                          }}
+                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-[12px] font-semibold text-slate-500 hover:border-blue-100 hover:text-[#1E40AF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          Email
+                        </button>
+                        <button
+                          onClick={() => setLocation('/candidate-profile')}
+                          className="flex-1 px-3 py-2 rounded-xl border border-[#1E40AF]/20 bg-[#1E40AF]/10 text-[12px] font-semibold text-[#1E40AF] hover:bg-[#1E40AF]/20 transition-colors"
+                        >
+                          Profile
+                        </button>
+                    </div>
+
+                    <p className="text-[11px] text-slate-400 mb-4 max-w-[240px]">
+                      {soloTip}
+                    </p>
 
                     {/* Recruitment Status Widget - Always visible on mobile, reveals on hover on desktop */}
                     <div className="w-full mt-auto relative">
@@ -570,12 +879,20 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                   <p className="text-xs text-slate-500">{candidate.code}</p>
                 </div>
               </div>
-              <button 
-                onClick={toggleExpand}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
-              >
-                <ChevronUp className="w-5 h-5 rotate-180" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowAdminPanel(true)}
+                  className="px-3 py-2 rounded-xl bg-blue-50 text-[#1E40AF] text-xs font-semibold border border-blue-100 hover:bg-blue-100 transition-colors"
+                >
+                  HR Console
+                </button>
+                <button 
+                  onClick={toggleExpand}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                >
+                  <ChevronUp className="w-5 h-5 rotate-180" />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 pb-32 space-y-8">
