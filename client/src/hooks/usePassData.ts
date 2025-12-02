@@ -26,12 +26,15 @@ import {
   toggleAutomation,
   getLinksForCode,
   updateLinkSlot,
+  getUniversalRecord,
+  updateUniversalRecord,
   type PassDataStore,
   type PassSettings,
   type PassLink,
   type PassLinkSlot,
   type PassModules,
   type PassAutomations,
+  type UniversalPassRecord,
 } from '@/lib/passDataStore';
 import type { CandidateWithRelations, TimelineEntry } from '@shared/schema';
 
@@ -89,6 +92,17 @@ export function usePassData() {
 
   const removeTimeline = useCallback((code: string, entryId: number): boolean => {
     return deleteTimelineEntry(code, entryId);
+  }, []);
+
+  const getBlueprint = useCallback((code: string): UniversalPassRecord => {
+    return getUniversalRecord(code);
+  }, []);
+
+  const editBlueprint = useCallback((
+    code: string,
+    updates: Partial<UniversalPassRecord>,
+  ): UniversalPassRecord => {
+    return updateUniversalRecord(code, updates);
   }, []);
 
   const getSettings = useCallback((code: string): PassSettings => {
@@ -164,6 +178,8 @@ export function usePassData() {
     addTimeline,
     editTimeline,
     removeTimeline,
+    getUniversalRecord: getBlueprint,
+    updateUniversalRecord: editBlueprint,
     
     // Export/Import
     exportData,

@@ -2,33 +2,38 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
-  ChevronUp, 
-  MapPin, 
-  Mail, 
-  Phone, 
-  Briefcase, 
-  CheckCircle2, 
-  Clock, 
-  Calendar,
-  Home,
-  ListTodo,
-  User,
-  Settings,
-  ShieldCheck,
-  RotateCw,
-  FileText,
   ArrowRight,
-  CheckSquare,
+  Bell,
+  Briefcase,
+  Calendar,
   CalendarDays,
-  FileCheck,
+  CheckCircle2,
+  CheckSquare,
   ChevronRight,
-  Share2
+  ChevronUp,
+  Clock,
+  FileCheck,
+  FileText,
+  Home,
+  LifeBuoy,
+  ListTodo,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  RotateCw,
+  Settings,
+  Share2,
+  ShieldCheck,
+  User,
+  Wallet,
 } from 'lucide-react';
 import type { CandidateWithRelations } from '@shared/schema';
 import { cn } from '@/lib/utils';
 import logo from '@assets/baynunah-logo_1764408063481.png';
 import { usePassData } from '@/hooks/usePassData';
-import type { PassLink, PassLinkSlot, PassSettings, SlotStatus } from '@/lib/passDataStore';
+import type { PassLink, PassLinkSlot, PassSettings, SlotStatus, PassPersona, UniversalPassRecord } from '@/lib/passDataStore';
+import { PASS_MODE_CONFIG, type FooterAction } from '@/lib/passModes';
 
 import { useLocation } from 'wouter';
 
@@ -36,54 +41,8 @@ interface UniversalPassProps {
   candidate: CandidateWithRelations;
 }
 
-type Persona = 'candidate' | 'manager' | 'onboarding';
+type Persona = PassPersona;
 type MaintenanceKey = keyof PassSettings['automations'];
-
-// Data for the back of the card
-const CANDIDATE_BACK_DATA = {
-  timeline: [
-    { stage: "Application", status: "completed", date: "Nov 25" },
-    { stage: "Screening", status: "completed", date: "Nov 26" },
-    { 
-      stage: "Assessment", 
-      status: "completed", 
-      date: "Nov 28",
-      components: {
-        softSkills: { required: true, status: "completed", link: "#" },
-        technical: { required: false, status: "skipped", link: "#" }
-      }
-    },
-    { 
-      stage: "Interview", 
-      status: "current", 
-      date: "Dec 05", 
-      time: "14:00", 
-      location: "HQ, Floor 4" 
-    },
-    { stage: "Offer", status: "pending", date: "-" },
-    { stage: "Onboarding", status: "pending", startDate: "-" }
-  ],
-  assessments: {
-    softSkills: { required: true, status: "Completed", link: "#" },
-    technical: { required: true, status: "Pending", link: "#" }
-  },
-  nextStep: {
-    label: "Final Interview",
-    date: "Dec 05",
-    time: "14:00 PM",
-    location: "Baynunah Tower, Floor 4",
-    instructions: "Please bring your original ID and portfolio."
-  },
-  documents: {
-    uploadedByCandidate: [
-      { type: "Resume/CV", url: "#", uploadedDate: "Nov 25" },
-      { type: "Portfolio", url: "#", uploadedDate: "Nov 25" }
-    ],
-    hrUpdates: [
-      { message: "Visa eligibility confirmed", date: "Nov 27" }
-    ]
-  }
-};
 
 export default function UniversalPass({ candidate }: UniversalPassProps) {
   const [expanded, setExpanded] = useState(false);
@@ -92,6 +51,8 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
   const [showVerification, setShowVerification] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showSupportPanel, setShowSupportPanel] = useState(false);
+  const [activeMenuTile, setActiveMenuTile] = useState<string | null>(null);
   const [, setLocation] = useLocation();
   const {
     store,
@@ -101,6 +62,8 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     getLinksForCode: fetchLinksForCode,
     updateLinkSlot: mutateLinkSlot,
     updatePassSettings,
+    getUniversalRecord: fetchUniversalRecord,
+    updateUniversalRecord: mutateBlueprint,
   } = usePassData();
 
   useEffect(() => {
@@ -135,31 +98,18 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     return { link, slot: preferredSlot };
   }, [linkedFlows, candidate.code]);
 
+  const blueprint = useMemo(
+    () => fetchUniversalRecord(candidate.code),
+    [candidate.code, fetchUniversalRecord, store.lastUpdated],
+  );
+
   const persona: Persona = useMemo(() => {
     if (candidate.code.startsWith('REQ')) return 'manager';
-    if (candidate.code.startsWith('ONB')) return 'onboarding';
+    if (candidate.code.startsWith('ONB') || candidate.code.startsWith('EMP')) return 'employee';
     return 'candidate';
   }, [candidate.code]);
 
-  const personaMeta: Record<Persona, { badge: string; caption: string; accent: string }> = {
-    candidate: {
-      badge: 'Candidate Journey',
-      caption: 'Share progress updates instantly.',
-      accent: 'text-[#1E40AF]',
-    },
-    manager: {
-      badge: 'Hiring Manager Brief',
-      caption: 'Keep leadership synced without extra decks.',
-      accent: 'text-emerald-600',
-    },
-    onboarding: {
-      badge: 'Onboarding Checklist',
-      caption: 'Make day-one ready in a glance.',
-      accent: 'text-amber-600',
-    },
-  };
-
-  const personaCopy = personaMeta[persona];
+  const modeConfig = PASS_MODE_CONFIG[persona];
 
   const themeTokens: Record<PassSettings['theme'], {
     card: string;
@@ -199,6 +149,22 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     ].filter((item) => item.enabled);
   }, [passSettings.modules, linkedFlows.length]);
 
+  const identitySecondary = modeConfig.identity.secondaryAccessor(blueprint);
+  const identityMeta = modeConfig.identity.metadataAccessor(blueprint);
+  const quickStageLabel = modeConfig.stageLabels[blueprint.stage.current] ?? modeConfig.stageLabels[0];
+  const quickStageStatus = blueprint.stage.status;
+
+  const timelinePreview = modeConfig.stageLabels.map((label, index) => {
+    if (index < blueprint.stage.current) return { label, status: 'completed' as const };
+    if (index === blueprint.stage.current) return { label, status: 'current' as const };
+    return { label, status: 'upcoming' as const };
+  });
+
+  const evaluationEntries = Object.entries(blueprint.evaluation);
+  const supportActions = modeConfig.support;
+  const footerButtons = modeConfig.footer;
+  const menuTiles = modeConfig.menuTiles;
+
   const timelineStats = useMemo(() => {
     return candidate.timeline.reduce(
       (acc, item) => {
@@ -221,13 +187,13 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     [candidate.timeline]
   );
 
-  const outstandingDocs = Math.max(0, (persona === 'onboarding' ? 5 : 2) - candidate.documents.length);
+  const outstandingDocs = Math.max(0, (persona === 'employee' ? 5 : 2) - candidate.documents.length);
 
   const workloadScore = useMemo(() => {
     const base = timelineStats.current * 20 + timelineStats.upcoming * 10;
     const docPenalty = outstandingDocs * 8;
     const evaluationLift = candidate.evaluations.length * 5;
-    const personaBoost = persona === 'onboarding' ? 10 : persona === 'manager' ? 5 : 0;
+    const personaBoost = persona === 'employee' ? 10 : persona === 'manager' ? 5 : 0;
     return Math.min(100, 45 + base + evaluationLift - docPenalty + personaBoost);
   }, [timelineStats, outstandingDocs, candidate.evaluations.length, persona]);
 
@@ -247,7 +213,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
         tone: 'reminder',
       });
     }
-    if (candidate.documents.length < (persona === 'onboarding' ? 4 : 2)) {
+    if (candidate.documents.length < (persona === 'employee' ? 4 : 2)) {
       actions.push({
         label: 'Request missing documents',
         detail: 'Send secure upload link to candidate',
@@ -269,7 +235,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     if (persona === 'manager') {
       return 'Log one concise update after each interview to keep managers aligned without extra calls.';
     }
-    if (persona === 'onboarding') {
+    if (persona === 'employee') {
       return 'Schedule equipment, access, and first-day buddy at least 48 hours before start.';
     }
     return 'Send micro-updates after every milestone so candidates feel guided even with a lean HR team.';
@@ -301,6 +267,27 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     mutateLinkSlot(link.id, slot.id, payload);
   };
 
+  const handleFooterAction = (action: FooterAction) => {
+    if (action === 'menu') {
+      setExpanded(true);
+      return;
+    }
+    if (action === 'support') {
+      setShowSupportPanel(true);
+      return;
+    }
+    setLocation('/candidate-profile');
+  };
+
+  const toggleBlueprintSetting = (key: keyof UniversalPassRecord['settings']) => {
+    mutateBlueprint(candidate.code, {
+      settings: {
+        ...blueprint.settings,
+        [key]: !blueprint.settings[key],
+      },
+    });
+  };
+
   const toggleExpand = () => setExpanded(!expanded);
   const toggleFlip = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -314,7 +301,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
 
   const getPassType = () => {
     if (persona === 'manager') return 'MANAGER PASS';
-    if (persona === 'onboarding') return 'ONBOARDING PASS';
+    if (persona === 'employee') return 'EMPLOYEE PASS';
     return 'CANDIDATE PASS';
   };
 
@@ -336,52 +323,57 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                         <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
                             <CalendarDays className="w-4 h-4" />
                         </div>
-                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Timeline</span>
+                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Full Timeline</span>
                     </div>
                     <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
-                        {CANDIDATE_BACK_DATA.timeline.map((item, i) => (
-                            <div key={i} className="flex items-start gap-3">
+                        {modeConfig.stageLabels.map((label, index) => {
+                          const historyEntry = blueprint.stage.history.find((entry) => entry.stage === index);
+                          const status = index < blueprint.stage.current ? 'completed' : index === blueprint.stage.current ? 'current' : 'upcoming';
+                          return (
+                            <div key={label} className="flex items-start gap-3">
                                 <div className={cn(
                                     "w-2 h-2 rounded-full mt-1.5 shrink-0",
-                                    item.status === 'completed' ? "bg-emerald-500" : 
-                                    item.status === 'current' ? "bg-blue-600 animate-pulse" : "bg-slate-200"
+                                    status === 'completed' ? "bg-emerald-500" :
+                                    status === 'current' ? "bg-blue-600 animate-pulse" : "bg-slate-200"
                                 )} />
                                 <div className="flex-1">
-                                    <p className={cn("text-xs font-semibold leading-tight", item.status === 'upcoming' ? "text-slate-400" : "text-slate-700")}>{item.stage}</p>
-                                    {item.date && item.date !== '-' && <p className="text-[10px] text-slate-400">{item.date}</p>}
+                                    <p className={cn("text-xs font-semibold leading-tight", status === 'upcoming' ? "text-slate-400" : "text-slate-700")}>{label}</p>
+                                    {historyEntry?.date && <p className="text-[10px] text-slate-400">{historyEntry.date}</p>}
                                 </div>
-                                {item.status === 'completed' && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />}
+                                {status === 'completed' && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />}
                             </div>
-                        ))}
+                          );
+                        })}
                     </div>
                 </div>
             );
         case 'evaluations':
              return (
                 <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col h-full">
-                        <div className="flex items-center gap-2 mb-4 shrink-0">
+                    <div className="flex items-center gap-2 mb-4 shrink-0">
                         <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
                             <CheckSquare className="w-4 h-4" />
                         </div>
-                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Assessments</span>
+                        <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Evaluations</span>
                     </div>
                     <div className="space-y-3 overflow-y-auto custom-scrollbar">
-                            {Object.entries(CANDIDATE_BACK_DATA.assessments).map(([key, data]) => (
-                                <div key={key} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <span className="text-xs font-medium text-slate-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                                {data.status === 'Completed' ? (
-                                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">Completed</span>
+                        {evaluationEntries.map(([key, value]) => (
+                            <div key={key} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <span className="text-xs font-medium text-slate-600 capitalize">{key.replace('_', ' ')}</span>
+                                {typeof value === 'number' ? (
+                                    <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">{value}%</span>
                                 ) : (
-                                    <a href={data.link} className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1 bg-white px-3 py-1 rounded-lg border border-blue-100 shadow-sm">
+                                    <button className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1 bg-white px-3 py-1 rounded-lg border border-blue-100 shadow-sm">
                                         Start <ArrowRight className="w-3 h-3" />
-                                    </a>
+                                    </button>
                                 )}
-                                </div>
-                            ))}
+                            </div>
+                        ))}
                     </div>
                 </div>
              );
         case 'next':
+            const nextAction = blueprint.actions[0];
             return (
                 <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col h-full">
                     <div className="flex justify-between items-start mb-4">
@@ -389,21 +381,33 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
                                 <Clock className="w-4 h-4" />
                             </div>
-                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Next Step</span>
+                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Next Action</span>
                         </div>
-                        <span className="text-[10px] font-bold text-[#1E40AF] bg-blue-50 px-2 py-1 rounded-lg">{CANDIDATE_BACK_DATA.nextStep.date}</span>
+                        <span className="text-[10px] font-bold text-[#1E40AF] bg-blue-50 px-2 py-1 rounded-lg">{quickStageLabel}</span>
                     </div>
-                    <div className="mt-2 pl-1 space-y-3">
-                        <p className="text-lg font-bold text-slate-800 leading-tight">{CANDIDATE_BACK_DATA.nextStep.label}</p>
-                        <div className="space-y-2">
-                            <p className="text-xs text-slate-500 flex items-center gap-2">
-                                <Clock className="w-3.5 h-3.5" /> {CANDIDATE_BACK_DATA.nextStep.time}
+                    <div className="mt-2 space-y-3">
+                        <p className="text-lg font-bold text-slate-800 leading-tight">{nextAction?.label ?? 'Awaiting update'}</p>
+                        {nextAction?.options && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {nextAction.options.map((option) => (
+                              <button
+                                key={option}
+                                className={cn(
+                                  "px-3 py-1.5 rounded-xl border text-xs font-semibold",
+                                  nextAction.response === option ? "border-[#1E40AF] text-[#1E40AF] bg-blue-50" : "border-slate-200 text-slate-500"
+                                )}
+                              >
+                                {option}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="space-y-2 text-xs text-slate-500">
+                            <p className="flex items-center gap-2">
+                                <Clock className="w-3.5 h-3.5" /> {new Date().toLocaleDateString()}
                             </p>
-                            <p className="text-xs text-slate-500 flex items-center gap-2">
-                                <MapPin className="w-3.5 h-3.5" /> {CANDIDATE_BACK_DATA.nextStep.location}
-                            </p>
-                             <p className="text-xs text-slate-500 flex items-start gap-2 bg-slate-50 p-2 rounded-lg mt-2">
-                                <span className="font-semibold shrink-0">Note:</span> {CANDIDATE_BACK_DATA.nextStep.instructions}
+                            <p className="flex items-center gap-2">
+                                <MapPin className="w-3.5 h-3.5" /> {blueprint.personal.location ?? 'Hybrid / Remote'}
                             </p>
                         </div>
                     </div>
@@ -415,26 +419,29 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
             }
             return (
                 <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col h-full">
-                        <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-2 mb-4">
                         <div className="p-1.5 rounded-lg bg-orange-50 text-orange-600">
                             <FileText className="w-4 h-4" />
                         </div>
                         <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Documents</span>
                     </div>
                     <div className="space-y-2 overflow-y-auto custom-scrollbar">
-                        {CANDIDATE_BACK_DATA.documents.uploadedByCandidate.map((doc, i) => (
-                            <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 hover:bg-slate-100 transition-colors cursor-pointer">
+                        {blueprint.documents.map((doc, i) => (
+                            <div key={`${doc.name}-${i}`} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 hover:bg-slate-100 transition-colors cursor-pointer">
                                 <FileCheck className="w-4 h-4 text-slate-400 shrink-0" />
                                 <div className="overflow-hidden">
-                                    <p className="text-xs font-semibold text-slate-700 truncate">{doc.type}</p>
-                                    <p className="text-[10px] text-slate-400">Uploaded {doc.uploadedDate}</p>
+                                    <p className="text-xs font-semibold text-slate-700 truncate">{doc.name}</p>
+                                    <p className="text-[10px] text-slate-400">{doc.type ?? 'Document'}</p>
                                 </div>
                             </div>
                         ))}
-                            {CANDIDATE_BACK_DATA.documents.hrUpdates.map((update, i) => (
-                            <div key={i + 10} className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center gap-3">
+                        {blueprint.notes.map((note, i) => (
+                            <div key={`${note.text}-${i}`} className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                                <p className="text-xs font-medium text-blue-800">{update.message}</p>
+                                <div>
+                                    <p className="text-xs font-medium text-blue-800">{note.text}</p>
+                                    <p className="text-[10px] text-blue-500">{note.from}</p>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -529,6 +536,64 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     }
   };
 
+  const renderMenuTileContent = (tileId: string | null) => {
+    if (!tileId) return null;
+    switch (tileId) {
+      case 'inbox':
+        return (
+          <div className="space-y-3">
+            {blueprint.notes.map((note, idx) => (
+              <div key={`${note.text}-${idx}`} className="p-3 rounded-2xl border border-slate-100 bg-slate-50">
+                <p className="text-sm text-slate-700">{note.text}</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 mt-1">{note.from}</p>
+              </div>
+            ))}
+          </div>
+        );
+      case 'settings':
+        return (
+          <div className="flex gap-3">
+            {(['whatsapp', 'dark_mode'] as (keyof UniversalPassRecord['settings'])[]).map((setting) => (
+              <button
+                key={setting}
+                onClick={() => toggleBlueprintSetting(setting)}
+                className={cn(
+                  "flex-1 px-4 py-3 rounded-2xl border text-left",
+                  blueprint.settings[setting] ? "border-[#1E40AF] text-[#1E40AF] bg-blue-50" : "border-slate-200 text-slate-500"
+                )}
+              >
+                <p className="text-sm font-semibold capitalize">{setting.replace('_', ' ')}</p>
+                <p className="text-[10px] uppercase tracking-[0.3em]">{blueprint.settings[setting] ? 'Enabled' : 'Disabled'}</p>
+              </button>
+            ))}
+          </div>
+        );
+      case 'payslips':
+        return (
+          <div className="space-y-2 text-sm text-slate-600">
+            <p>Latest payslip: <span className="font-semibold">Nov 2025</span></p>
+            <p>Bonus status: <span className="text-emerald-600 font-semibold">Approved</span></p>
+          </div>
+        );
+      case 'leave':
+        return (
+          <div className="space-y-2 text-sm text-slate-600">
+            <p>Balance: <span className="font-semibold">14 days</span></p>
+            <p>Next holiday window opens in <span className="font-semibold">3 days</span></p>
+          </div>
+        );
+      case 'approvals':
+        return (
+          <div className="space-y-2 text-sm text-slate-600">
+            <p>Offer approval awaiting signature.</p>
+            <p>RRF-2025-001 · <span className="text-amber-600 font-semibold">Pending</span></p>
+          </div>
+        );
+      default:
+        return <p className="text-sm text-slate-500">Detailed view coming soon.</p>;
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans bg-[#ffffffde] dark:bg-slate-900">
       {/* Live Time Indicator */}
@@ -613,8 +678,8 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
               <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between gap-6">
                 <div>
                   <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Solo HR Console</p>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-1">{personaCopy.badge}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{personaCopy.caption}</p>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-1">{modeConfig.badge}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{modeConfig.caption}</p>
                 </div>
                 <button
                   onClick={() => setShowAdminPanel(false)}
@@ -795,6 +860,60 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {showSupportPanel && (
+          <motion.div
+            key="support-panel"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-slate-900/25 backdrop-blur-sm"
+          >
+            <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-2xl p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Support Desk</p>
+                  <p className="text-lg font-semibold text-slate-900 dark:text-white">We’re here for you 24/7</p>
+                </div>
+                <button
+                  onClick={() => setShowSupportPanel(false)}
+                  className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="space-y-3">
+                {supportActions.map((action) => {
+                  const Icon = action.icon;
+                  return (
+                    <button
+                      key={action.label}
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          window.open(action.value, '_blank');
+                        }
+                      }}
+                      className="w-full flex items-center justify-between rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-800/60 px-4 py-3 text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-2xl bg-blue-50 dark:bg-slate-700 text-[#1E40AF] dark:text-blue-300 flex items-center justify-center">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900 dark:text-white">{action.label}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{action.detail}</p>
+                        </div>
+                      </div>
+                      <LifeBuoy className="w-4 h-4 text-slate-300" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {!expanded ? (
           <motion.div 
@@ -815,221 +934,191 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
               {/* FRONT FACE */}
               <div 
                 className={cn(
-                  "absolute inset-0 backface-hidden rounded-[40px] p-8 flex flex-col items-center text-center group pass-card transition-colors duration-500 border border-transparent",
+                  "absolute inset-0 backface-hidden rounded-[40px] p-6 flex flex-col group pass-card transition-colors duration-500 border border-transparent",
                   themeToken.card
                 )}
-                style={{ 
-                    backfaceVisibility: 'hidden',
-                }}
+                style={{ backfaceVisibility: 'hidden' }}
               >
-                {/* Admin Console Button */}
-                <button 
+                <div className={cn("absolute top-0 left-0 w-full h-1 opacity-60 rounded-t-[40px]", getRoleGradient())} />
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAdminPanel(true);
                   }}
-                  className="absolute top-6 left-6 p-2 rounded-full text-slate-400 dark:text-slate-500 hover:text-[#1E40AF] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors z-20"
+                  className="absolute top-6 left-6 p-2 rounded-full text-slate-500 hover:text-[#1E40AF] hover:bg-slate-100/60 transition-colors"
                 >
                   <ShieldCheck className="w-4 h-4" />
                 </button>
-
-                {/* Flip Button */}
-                <button 
+                <button
                   onClick={toggleFlip}
-                  className="absolute top-6 right-6 p-2 rounded-full text-slate-400 dark:text-slate-500 hover:text-[#1E40AF] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors z-20"
+                  className="absolute top-6 right-6 p-2 rounded-full text-slate-500 hover:text-[#1E40AF] hover:bg-slate-100/60 transition-colors"
                 >
                   <RotateCw className="w-4 h-4" />
                 </button>
 
-                {/* Security Strip */}
-                <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50 rounded-t-[40px]", getRoleGradient())} />
-
-                <div className="flex flex-col items-center w-full h-full pt-4">
-                    {/* Logo */}
-                    <div className="h-6 mb-4 flex items-center justify-center w-full">
-                        <img src={logo} alt="Baynunah" className="h-full object-contain invert dark:invert-0 opacity-80" />
+                <div className="flex flex-col w-full h-full space-y-5 pt-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-2xl bg-white/80 shadow-inner shadow-white/60 flex items-center justify-center">
+                        <img src={logo} alt="Baynunah" className="h-6 object-contain invert opacity-80" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.3em]">Universal Pass</p>
+                        <p className="text-sm font-semibold text-slate-600 dark:text-slate-200">{modeConfig.passTitle}</p>
+                      </div>
                     </div>
+                    <button
+                      className="relative p-2 rounded-full bg-white/60 text-slate-500 shadow-sm hover:bg-white transition-colors"
+                      onClick={() => setShowSupportPanel(true)}
+                    >
+                      <Bell className="w-4 h-4" />
+                      <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    </button>
+                  </div>
 
-                    {/* Pass Type */}
-                    <div className="flex flex-col items-center gap-2 mb-8">
-                        <p className={cn("tracking-[0.2em] uppercase font-medium text-[14px]", passSettings.theme === 'tech' ? "text-cyan-200" : "text-[#62748e]")}>
-                            {getPassType()}
-                        </p>
-                        <span className={cn("px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.3em]", themeToken.pill)}>
-                            {personaCopy.badge}
+                  <div className="w-full rounded-[30px] bg-white/80 dark:bg-slate-900/40 border border-white/50 dark:border-slate-700/60 p-5 text-left shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">{modeConfig.badge}</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-2">{blueprint.personal.name}</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-300">{identitySecondary}</p>
+                    <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-300">
+                      <span>{modeConfig.caption}</span>
+                      <span className="font-mono tracking-wide text-slate-700 dark:text-slate-100">{identityMeta}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="col-span-2 rounded-2xl bg-white/70 dark:bg-slate-900/40 border border-white/50 dark:border-slate-700/60 p-4">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Current Stage</p>
+                      <p className="text-lg font-semibold text-slate-900 dark:text-white">{quickStageLabel}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{blueprint.stage.history.length} milestones logged</p>
+                    </div>
+                    <div className="rounded-2xl bg-white/60 dark:bg-slate-900/30 border border-white/40 dark:border-slate-700/50 p-4 flex flex-col justify-between">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Status Required</p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{quickStageStatus}</p>
+                    </div>
+                  </div>
+
+                  <div className="w-full rounded-[28px] bg-white/70 dark:bg-slate-900/40 border border-white/50 dark:border-slate-800/60 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Journey Preview</span>
+                      <span className="text-[10px] text-slate-400">Menu → Full timeline</span>
+                    </div>
+                    <div className="flex gap-2">
+                      {timelinePreview.map((node) => (
+                        <div key={node.label} className="flex-1">
+                          <div
+                            className={cn(
+                              "h-2 rounded-full transition-colors",
+                              node.status === 'completed' ? 'bg-emerald-400' : node.status === 'current' ? 'bg-[#1E40AF]' : 'bg-slate-200'
+                            )}
+                          />
+                          <p className="mt-1 text-[9px] font-semibold uppercase tracking-widest text-slate-400 truncate">{node.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="w-full rounded-[32px] bg-white/70 dark:bg-slate-900/40 border border-white/40 dark:border-slate-800/60 p-4 flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Wallet QR</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Tap to share full profile</p>
+                      </div>
+                      <div
+                        className="relative w-20 h-20 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 cursor-pointer"
+                        onClick={() => setShowVerification(true)}
+                      >
+                        <QRCodeSVG value={`https://baynunah-pass.com/pass/${candidate.code}`} size={64} fgColor="#1f2937" />
+                        <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+                          {candidate.status}
                         </span>
-                        <p className={cn("text-[10px] font-medium max-w-[220px] leading-snug", personaCopy.accent, "dark:opacity-80")}>
-                            {personaCopy.caption}
-                        </p>
+                      </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        disabled={!canCall}
+                        onClick={() => canCall && typeof window !== 'undefined' && window.open(`tel:${candidate.phone}`, '_self')}
+                        className="flex-1 px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-[12px] font-semibold text-slate-600 dark:text-slate-300 hover:border-[#1E40AF] transition-colors disabled:opacity-40"
+                      >
+                        Call
+                      </button>
+                      <button
+                        disabled={!canEmail}
+                        onClick={() => canEmail && typeof window !== 'undefined' && window.open(`mailto:${candidate.email}?subject=Baynunah Pass Update`, '_self')}
+                        className="flex-1 px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-[12px] font-semibold text-slate-600 dark:text-slate-300 hover:border-[#1E40AF] transition-colors disabled:opacity-40"
+                      >
+                        Email
+                      </button>
+                      <button
+                        onClick={() => setLocation('/candidate-profile')}
+                        className="flex-1 px-3 py-2 rounded-2xl border border-[#1E40AF]/30 bg-[#1E40AF]/10 text-[12px] font-semibold text-[#1E40AF] hover:bg-[#1E40AF]/20 transition-colors"
+                      >
+                        Profile
+                      </button>
+                    </div>
+                  </div>
 
-                    {/* QR Code Area */}
-                    <div className="relative flex flex-col items-center group/qr cursor-pointer mb-8" onClick={() => setShowVerification(true)}>
-                        <div className="w-48 h-48 relative flex items-center justify-center group-hover/qr:scale-105 transition-transform duration-300 bg-white dark:bg-slate-700 rounded-3xl pass-card__qr p-4">
-                             {/* Corner Brackets */}
-                             <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-slate-300 dark:border-slate-500 rounded-tl-lg" />
-                             <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-slate-300 dark:border-slate-500 rounded-tr-lg" />
-                             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-slate-300 dark:border-slate-500 rounded-bl-lg" />
-                             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-slate-300 dark:border-slate-500 rounded-br-lg" />
-
-                             {/* Subtle Scan Animation */}
-                             <motion.div 
-                                className="absolute left-4 right-4 h-[1.5px] bg-gradient-to-r from-transparent via-blue-400/60 to-transparent z-10"
-                                animate={{ top: ["10%", "90%"], opacity: [0, 1, 0] }}
-                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            />
-                            
-                            <QRCodeSVG 
-                                value={`https://baynunah-pass.com/pass/${candidate.code}`} 
-                                size={140} 
-                                fgColor="#334155" 
-                                bgColor="transparent"
-                            />
+                  {passSettings.modules.availability && primaryLinkedSlot && (
+                    <div className="w-full rounded-[28px] border border-white/40 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/40 p-4 shadow-inner">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Linked availability</p>
+                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{primaryLinkedSlot.link.title}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{primaryLinkedSlot.slot.date} · {primaryLinkedSlot.slot.time}</p>
                         </div>
-                        
-                        <div className="absolute -bottom-3 bg-white dark:bg-slate-700 px-4 py-1 rounded-full shadow-sm border border-slate-100 dark:border-slate-600 flex items-center gap-1.5">
-                            <span className={cn("w-1.5 h-1.5 rounded-full", candidate.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
-                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{candidate.status}</span>
-                        </div>
-                    </div>
-
-                    {/* Identity */}
-                    <div className="space-y-1 mb-6">
-                        <h1 className={cn("text-2xl font-bold tracking-tight", themeToken.accent)}>{candidate.name}</h1>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{candidate.title}</p>
-                        {candidate.department && (
-                            <p className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1">{candidate.department}</p>
-                        )}
-                    </div>
-
-                    {/* Solo Admin Shortcuts */}
-                    <div className="w-full flex items-center justify-center gap-2 mb-6">
                         <button
-                          disabled={!canCall}
                           onClick={() => {
-                            if (canCall && typeof window !== 'undefined') {
-                              window.open(`tel:${candidate.phone}`, '_self');
-                            }
+                            setIsFlipped(true);
+                            setActiveSection('linked');
                           }}
-                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-[12px] font-semibold text-slate-500 dark:text-slate-400 hover:border-blue-100 dark:hover:border-blue-700 hover:text-[#1E40AF] dark:hover:text-blue-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 hover:border-[#1E40AF]"
                         >
-                          Call
+                          Manage
                         </button>
-                        <button
-                          disabled={!canEmail}
-                          onClick={() => {
-                            if (canEmail && typeof window !== 'undefined') {
-                              window.open(`mailto:${candidate.email}?subject=Baynunah Pass Update`, '_self');
-                            }
-                          }}
-                          className="flex-1 px-3 py-2 rounded-xl border border-slate-100 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-[12px] font-semibold text-slate-500 dark:text-slate-400 hover:border-blue-100 dark:hover:border-blue-700 hover:text-[#1E40AF] dark:hover:text-blue-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          Email
-                        </button>
-                        <button
-                          onClick={() => setLocation('/candidate-profile')}
-                          className="flex-1 px-3 py-2 rounded-xl border border-[#1E40AF]/20 dark:border-blue-500/30 bg-[#1E40AF]/10 dark:bg-blue-500/20 text-[12px] font-semibold text-[#1E40AF] dark:text-blue-400 hover:bg-[#1E40AF]/20 dark:hover:bg-blue-500/30 transition-colors"
-                        >
-                          Profile
-                        </button>
-                    </div>
-
-                {passSettings.modules.availability && primaryLinkedSlot && (
-                    <div className="w-full mb-4 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white/80 dark:bg-slate-800/70 text-left p-4 shadow-sm">
-                        <div className="flex items-start justify-between gap-3">
-                            <div>
-                                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Linked Availability</p>
-                                <p className="text-sm font-semibold text-slate-900 dark:text-white">{primaryLinkedSlot.link.title}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{primaryLinkedSlot.slot.date} · {primaryLinkedSlot.slot.time}</p>
-                            </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {primaryLinkedSlot.link.slots.map((slot) => {
+                          const isSelected = slot.candidateCode === candidate.code && slot.status === 'booked';
+                          const disabled = slot.status === 'held' || (slot.status === 'booked' && !isSelected);
+                          return (
                             <button
-                                onClick={() => {
-                                    setIsFlipped(true);
-                                    setActiveSection('linked');
-                                }}
-                                className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 text-[11px] font-semibold text-slate-500 dark:text-slate-300 hover:border-[#1E40AF] hover:text-[#1E40AF]"
+                              key={slot.id}
+                              onClick={() => handleCandidateSlotInteraction(primaryLinkedSlot.link, slot)}
+                              disabled={disabled}
+                              className={cn(
+                                "px-3 py-1.5 rounded-full border text-[11px] font-semibold",
+                                isSelected
+                                  ? "bg-[#1E40AF] text-white border-[#1E40AF]"
+                                  : "border-slate-200 text-slate-500 hover:border-[#1E40AF]/40 disabled:opacity-40"
+                              )}
                             >
-                                Manage
+                              {slot.label}
                             </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-3">
-                            {primaryLinkedSlot.link.slots.map((slot) => {
-                                const isSelected = slot.candidateCode === candidate.code && slot.status === 'booked';
-                                const isDisabled = persona !== 'candidate' || slot.status === 'held' || (slot.status === 'booked' && !isSelected);
-                                return (
-                                    <button
-                                        key={slot.id}
-                                        onClick={() => handleCandidateSlotInteraction(primaryLinkedSlot.link, slot)}
-                                        disabled={isDisabled}
-                                        className={cn(
-                                            "px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-colors",
-                                            isSelected
-                                                ? "bg-[#1E40AF] text-white border-[#1E40AF]"
-                                                : "border-slate-200 text-slate-500 hover:border-[#1E40AF]/40 disabled:opacity-40"
-                                        )}
-                                    >
-                                        {slot.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                )}
+                  )}
 
-                {passSettings.modules.interactions && (
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-4 max-w-[240px]">
-                      {soloTip}
-                    </p>
-                )}
-
-                {passSettings.modules.timeline && (
-                <div className="w-full mt-auto relative">
-                        {/* Container: visible on mobile, hover-reveal on desktop */}
-                        <div className="overflow-hidden max-h-[140px] opacity-100 md:max-h-0 md:opacity-0 md:group-hover:max-h-[140px] md:group-hover:opacity-100 transition-all duration-500 ease-out">
-                            <div 
-                                className="pt-4 border-t border-slate-100 hover:bg-slate-50 transition-colors rounded-xl p-2 cursor-pointer" 
-                                onClick={() => setLocation('/candidate-profile')}
-                            >
-                                <div className="flex justify-between items-end mb-2">
-                                    <div className="flex flex-col text-left">
-                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Recruitment Stage</span>
-                                        <span className="text-xs font-bold text-[#1E40AF] uppercase tracking-wide flex items-center gap-1">
-                                            {candidate.timeline.find(t => t.status === 'current')?.title || 'In Progress'}
-                                            <ChevronRight className="w-3 h-3 text-slate-300 hover:text-[#1E40AF] transition-colors" />
-                                        </span>
-                                    </div>
-                                    <span className="text-[9px] font-medium text-slate-400">
-                                        Step {candidate.timeline.findIndex(t => t.status === 'current') + 1} of {candidate.timeline.length}
-                                    </span>
-                                </div>
-                                
-                                <div className="flex gap-1 h-1.5 w-full">
-                                    {candidate.timeline.map((stage, i) => {
-                                        const isActive = stage.status === 'current';
-                                        const isCompleted = stage.status === 'completed';
-                                        return (
-                                            <div 
-                                                key={stage.id} 
-                                                className={cn(
-                                                    "h-full rounded-full flex-1 transition-colors",
-                                                    isActive ? "bg-[#1E40AF]" : 
-                                                    isCompleted ? "bg-emerald-400" : 
-                                                    "bg-slate-200"
-                                                )} 
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* Handle Indicator (Hidden on mobile, visible on desktop when widget is hidden) */}
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-200 rounded-full hidden md:block md:opacity-100 md:group-hover:opacity-0 transition-opacity duration-300 delay-100" />
-                </div>
-                )}
+                  <div className="mt-auto">
+                    <div className="flex items-center gap-3">
+                      {footerButtons.map((button) => {
+                        const Icon = button.icon;
+                        return (
+                          <button
+                            key={button.label}
+                            onClick={() => handleFooterAction(button.action)}
+                            className="flex-1 px-4 py-3 rounded-2xl border border-white/40 dark:border-slate-800/60 bg-white/75 dark:bg-slate-900/40 text-sm font-semibold text-slate-700 dark:text-slate-100 flex items-center justify-center gap-2 shadow-sm hover:border-[#1E40AF]/50 transition-colors"
+                          >
+                            <Icon className="w-4 h-4" />
+                            {button.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
-
               {/* BACK FACE (2x2 Menu or Detail) */}
               <div 
                 className={cn(
@@ -1252,6 +1341,48 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Pass Menu */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">Pass Menu</p>
+                    <p className="text-sm text-slate-500">Luxury shortcuts per persona</p>
+                  </div>
+                  {activeMenuTile && (
+                    <button onClick={() => setActiveMenuTile(null)} className="text-xs text-slate-500 hover:text-[#1E40AF]">
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {menuTiles.map((tile) => {
+                    const Icon = tile.icon;
+                    const active = activeMenuTile === tile.id;
+                    return (
+                      <button
+                        key={tile.id}
+                        onClick={() => setActiveMenuTile(tile.id)}
+                        className={cn(
+                          "p-4 rounded-2xl border text-left space-y-2 transition-colors",
+                          active ? "border-[#1E40AF] bg-blue-50 text-[#1E40AF]" : "border-slate-200 text-slate-600 hover:border-[#1E40AF]/40"
+                        )}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <div>
+                          <p className="text-sm font-semibold">{tile.label}</p>
+                          <p className="text-xs text-slate-500">{tile.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                {activeMenuTile && (
+                  <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                    {renderMenuTileContent(activeMenuTile)}
+                  </div>
+                )}
               </div>
             </div>
 

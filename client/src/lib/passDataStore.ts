@@ -6,6 +6,7 @@
 import type { CandidateWithRelations, TimelineEntry, Evaluation, Document } from '@shared/schema';
 import { MOCK_USERS, type UserData } from './mockData';
 
+export type PassPersona = 'candidate' | 'manager' | 'employee';
 export type PassTheme = 'light' | 'dark' | 'tech';
 
 export interface PassModules {
@@ -50,6 +51,77 @@ export interface PassLink {
   lastUpdated: string;
 }
 
+export interface StageHistoryEntry {
+  stage: number;
+  date: string;
+  status?: string;
+}
+
+export interface StageBlueprint {
+  current: number;
+  labels: string[];
+  status: string;
+  daysInCurrent: number;
+  history: StageHistoryEntry[];
+}
+
+export interface EvaluationSnapshot {
+  profile_fit: number | null;
+  soft_skills: number | null;
+  technical_skills: number | null;
+  interview_score: number | null;
+}
+
+export interface ActionBlueprint {
+  id: string;
+  label: string;
+  status: 'pending' | 'completed' | 'in_progress';
+  options?: string[];
+  response?: string | null;
+}
+
+export interface DocumentBlueprint {
+  name: string;
+  url: string;
+  type?: string;
+}
+
+export interface NoteBlueprint {
+  from: string;
+  text: string;
+  date: string;
+}
+
+export interface UniversalPassRecord {
+  id: string;
+  type: PassPersona;
+  personal: {
+    name: string;
+    position: string;
+    phone: string | null;
+    email: string;
+    location: string | null;
+    relocate?: boolean;
+    visa?: string | null;
+    expected_salary?: number | null;
+    notice_period?: number | null;
+    identifier: string;
+    department?: string | null;
+    employeeNumber?: string | null;
+  };
+  stage: StageBlueprint;
+  evaluation: EvaluationSnapshot;
+  actions: ActionBlueprint[];
+  documents: DocumentBlueprint[];
+  notes: NoteBlueprint[];
+  settings: {
+    whatsapp: boolean;
+    dark_mode: boolean;
+  };
+  updated_at: string;
+  updated_by: string;
+}
+
 const STORAGE_KEY = 'hr-digital-pass-data';
 const STORAGE_VERSION = '1.0';
 
@@ -71,6 +143,7 @@ export interface PassDataStore {
   candidates: Record<string, CandidateWithRelations>;
   settings: Record<string, PassSettings>;
   links: PassLink[];
+  blueprints: Record<string, UniversalPassRecord>;
   lastUpdated: string;
 }
 
@@ -86,6 +159,110 @@ function buildDefaultSettings(code: string): PassSettings {
     modules: { ...DEFAULT_MODULES },
     automations: { ...DEFAULT_AUTOMATIONS },
     theme: deriveThemeFromCode(code),
+  };
+}
+
+const DEFAULT_STAGE_LABELS: Record<PassPersona, string[]> = {
+  candidate: ['Application', 'Screening', 'Assessment', 'Interview', 'Offer', 'Onboarding'],
+  manager: ['New Role Request', 'HR Screening', 'Shortlisting', 'Evaluation', 'Interview Feedback', 'Final Decision'],
+  employee: ['Joining', 'Probation', 'Performance Review', 'Training & Development', 'Promotion/Transfer', 'Renewal / Exit'],
+};
+
+function derivePersonaFromCode(code: string): PassPersona {
+  if (code.startsWith('REQ')) return 'manager';
+  if (code.startsWith('ONB') || code.startsWith('EMP')) return 'employee';
+  return 'candidate';
+}
+
+function buildDefaultBlueprint(
+  record: CandidateWithRelations,
+  persona: PassPersona,
+): UniversalPassRecord {
+  const nowIso = new Date().toISOString();
+  const stageLabels = DEFAULT_STAGE_LABELS[persona];
+  const resolvedCurrent = Math.min(record.timeline.findIndex((t) => t.status === 'current'), stageLabels.length - 1);
+  const currentStageIndex = resolvedCurrent >= 0 ? resolvedCurrent : 0;
+  const statusText =
+    persona === 'manager'
+      ? 'Review shortlist'
+      : persona === 'employee'
+      ? 'Complete onboarding form'
+      : 'Confirm availability';
+
+  const stageHistory: StageHistoryEntry[] = record.timeline.map((entry, index) => ({
+    stage: index,
+    date: entry.date,
+    status: entry.status,
+  }));
+
+  const evaluation: EvaluationSnapshot = {
+    profile_fit: persona === 'candidate' ? 82 : null,
+    soft_skills: persona === 'candidate' ? 90 : null,
+    technical_skills: persona === 'candidate' ? 78 : null,
+    interview_score: persona === 'candidate' ? 88 : null,
+  };
+
+  const identifier =
+    persona === 'manager'
+      ? `MGR-${record.code.split('-').pop()?.padStart(3, '0') ?? '001'}`
+      : persona === 'employee'
+      ? `EMP-${record.code.split('-').pop()?.padStart(3, '0') ?? '001'}`
+      : `CAND-${new Date(record.createdAt).getFullYear()}-${record.code.split('-').pop()}`;
+
+  return {
+    id: identifier,
+    type: persona,
+    personal: {
+      name: record.name,
+      position: record.title,
+      phone: record.phone ?? null,
+      email: record.email,
+      location: record.location ?? null,
+      relocate: true,
+      visa: 'Employment Visa',
+      expected_salary: persona === 'candidate' ? 18000 : null,
+      notice_period: persona === 'employee' ? 0 : 30,
+      identifier,
+      department: record.department ?? null,
+      employeeNumber: persona === 'employee' ? identifier : null,
+    },
+    stage: {
+      current: currentStageIndex,
+      labels: stageLabels,
+      status: statusText,
+      daysInCurrent: 2,
+      history: stageHistory,
+    },
+    evaluation,
+    actions: [
+      {
+        id: 'confirm_slot',
+        label: persona === 'manager' ? 'Approve Interview Panel' : 'Confirm Interview Slot',
+        status: 'pending',
+        options: ['Sun 2PM', 'Mon 10AM', 'Tue 4PM'],
+        response: null,
+      },
+    ],
+    documents: record.documents.map((doc) => ({
+      name: doc.title,
+      url: doc.url ?? '#',
+      type: doc.type ?? 'Document',
+    })),
+    notes: [
+      {
+        from: persona === 'manager' ? 'HR Ops' : 'HR',
+        text: persona === 'employee'
+          ? 'Please review onboarding checklist before day one.'
+          : 'Please confirm availability.',
+        date: new Date().toISOString().split('T')[0],
+      },
+    ],
+    settings: {
+      whatsapp: true,
+      dark_mode: false,
+    },
+    updated_at: nowIso,
+    updated_by: 'system',
   };
 }
 
@@ -133,11 +310,15 @@ function createDefaultLinks(candidates: Record<string, CandidateWithRelations>):
 function upgradeStore(parsed?: Partial<PassDataStore>): PassDataStore {
   const candidates = parsed?.candidates ?? {};
   const settings: Record<string, PassSettings> = { ...(parsed?.settings ?? {}) };
+  const blueprints: Record<string, UniversalPassRecord> = { ...(parsed?.blueprints ?? {}) };
 
   Object.keys(candidates).forEach((code) => {
     const upper = code.toUpperCase();
     if (!settings[upper]) {
       settings[upper] = buildDefaultSettings(upper);
+    }
+    if (!blueprints[upper]) {
+      blueprints[upper] = buildDefaultBlueprint(candidates[upper], derivePersonaFromCode(upper));
     }
   });
 
@@ -150,6 +331,7 @@ function upgradeStore(parsed?: Partial<PassDataStore>): PassDataStore {
     candidates,
     settings,
     links,
+    blueprints,
     lastUpdated: parsed?.lastUpdated ?? new Date().toISOString(),
   };
 }
@@ -160,6 +342,52 @@ function ensureSettingsEntry(code: string): PassSettings {
     store.settings[upper] = buildDefaultSettings(upper);
   }
   return store.settings[upper];
+}
+
+function ensureBlueprintEntry(code: string): UniversalPassRecord {
+  const upper = code.toUpperCase();
+  if (!store.blueprints[upper]) {
+    const candidate = store.candidates[upper];
+    if (candidate) {
+      store.blueprints[upper] = buildDefaultBlueprint(candidate, derivePersonaFromCode(upper));
+    } else {
+      store.blueprints[upper] = {
+        id: upper,
+        type: derivePersonaFromCode(upper),
+        personal: {
+          name: upper,
+          position: 'Role',
+          phone: null,
+          email: 'unknown@example.com',
+          location: null,
+          identifier: upper,
+        },
+        stage: {
+          current: 0,
+          labels: DEFAULT_STAGE_LABELS.candidate,
+          status: 'Awaiting update',
+          daysInCurrent: 0,
+          history: [],
+        },
+        evaluation: {
+          profile_fit: null,
+          soft_skills: null,
+          technical_skills: null,
+          interview_score: null,
+        },
+        actions: [],
+        documents: [],
+        notes: [],
+        settings: {
+          whatsapp: true,
+          dark_mode: false,
+        },
+        updated_at: new Date().toISOString(),
+        updated_by: 'system',
+      };
+    }
+  }
+  return store.blueprints[upper];
 }
 
 // Initialize store from localStorage or mock data
@@ -187,12 +415,14 @@ function initializeStore(): PassDataStore {
 function createDefaultStore(): PassDataStore {
   const candidates: Record<string, CandidateWithRelations> = {};
   const settings: Record<string, PassSettings> = {};
+  const blueprints: Record<string, UniversalPassRecord> = {};
   
   // Convert mock users to CandidateWithRelations
   Object.entries(MOCK_USERS).forEach(([code, user]) => {
     const upper = code.toUpperCase();
     candidates[upper] = mockUserToCandidate(user);
     settings[upper] = buildDefaultSettings(upper);
+    blueprints[upper] = buildDefaultBlueprint(candidates[upper], derivePersonaFromCode(upper));
   });
   
   return {
@@ -200,6 +430,7 @@ function createDefaultStore(): PassDataStore {
     candidates,
     settings,
     links: createDefaultLinks(candidates),
+    blueprints,
     lastUpdated: new Date().toISOString(),
   };
 }
@@ -318,6 +549,7 @@ export function createCandidate(candidate: Partial<CandidateWithRelations> & { c
   
   store.candidates[code] = newCandidate;
   store.settings[code] = store.settings[code] ?? buildDefaultSettings(code);
+  store.blueprints[code] = buildDefaultBlueprint(newCandidate, derivePersonaFromCode(code));
   saveToLocalStorage();
   notifyListeners();
   
@@ -352,6 +584,7 @@ export function deleteCandidate(code: string): boolean {
   
   delete store.candidates[upperCode];
   delete store.settings[upperCode];
+  delete store.blueprints[upperCode];
   saveToLocalStorage();
   notifyListeners();
   
@@ -537,6 +770,50 @@ export function updateLinkSlot(
   return updatedLink;
 }
 
+export function getUniversalRecord(code: string): UniversalPassRecord {
+  return ensureBlueprintEntry(code);
+}
+
+export function updateUniversalRecord(
+  code: string,
+  updates: Partial<UniversalPassRecord>,
+): UniversalPassRecord {
+  const upper = code.toUpperCase();
+  const existing = ensureBlueprintEntry(upper);
+  const merged: UniversalPassRecord = {
+    ...existing,
+    ...updates,
+    personal: {
+      ...existing.personal,
+      ...(updates.personal ?? {}),
+    },
+    stage: {
+      ...existing.stage,
+      ...(updates.stage ?? {}),
+      labels: updates.stage?.labels ?? existing.stage.labels,
+      history: updates.stage?.history ?? existing.stage.history,
+    },
+    evaluation: {
+      ...existing.evaluation,
+      ...(updates.evaluation ?? {}),
+    },
+    actions: updates.actions ?? existing.actions,
+    documents: updates.documents ?? existing.documents,
+    notes: updates.notes ?? existing.notes,
+    settings: {
+      ...existing.settings,
+      ...(updates.settings ?? {}),
+    },
+    updated_at: updates.updated_at ?? new Date().toISOString(),
+    updated_by: updates.updated_by ?? 'system',
+  };
+
+  store.blueprints[upper] = merged;
+  saveToLocalStorage();
+  notifyListeners();
+  return merged;
+}
+
 // === Export/Import ===
 
 export function exportToJSON(): string {
@@ -556,9 +833,15 @@ export function importFromJSON(jsonString: string): boolean {
     store = {
       version: STORAGE_VERSION,
       candidates: parsed.candidates,
+      settings: parsed.settings ?? {},
+      links: parsed.links ?? [],
+      blueprints: parsed.blueprints ?? {},
       lastUpdated: new Date().toISOString(),
     };
     
+    // Ensure derived defaults
+    store = upgradeStore(store);
+
     saveToLocalStorage();
     notifyListeners();
     
