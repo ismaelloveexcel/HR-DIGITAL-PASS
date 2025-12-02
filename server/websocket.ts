@@ -10,7 +10,9 @@ interface WSClient {
 
 interface WSMessage {
   type: string;
-  payload: any;
+  payload?: any;
+  passCode?: string;
+  linkId?: string;
 }
 
 const clients: Map<WebSocket, WSClient> = new Map();
@@ -45,7 +47,7 @@ export function setupWebSocket(server: Server): WebSocketServer {
       clients.delete(ws);
     });
 
-    ws.send(JSON.stringify({ type: 'connected', payload: { timestamp: Date.now() } }));
+    ws.send(JSON.stringify({ type: 'connected', data: { timestamp: Date.now() } }));
   });
 
   log('WebSocket server initialized on /ws', 'ws');
@@ -53,25 +55,37 @@ export function setupWebSocket(server: Server): WebSocketServer {
 }
 
 function handleMessage(client: WSClient, message: WSMessage) {
+  const passCode = message.passCode || message.payload?.passCode;
+  const linkId = message.linkId || message.payload?.linkId;
+
   switch (message.type) {
     case 'subscribe':
-      if (message.payload.passCode) {
-        client.passCode = message.payload.passCode;
+      if (passCode) {
+        client.passCode = passCode;
       }
-      if (message.payload.linkId) {
-        client.subscribedLinks.add(message.payload.linkId);
+      if (linkId) {
+        client.subscribedLinks.add(linkId);
       }
       log(`Client subscribed: passCode=${client.passCode}, links=${Array.from(client.subscribedLinks).join(',')}`, 'ws');
       break;
 
+    case 'subscribe_slots':
+      if (linkId) {
+        client.subscribedLinks.add(linkId);
+        log(`Client subscribed to slots: linkId=${linkId}`, 'ws');
+      }
+      break;
+
     case 'unsubscribe':
-      if (message.payload.linkId) {
-        client.subscribedLinks.delete(message.payload.linkId);
+    case 'unsubscribe_slots':
+      if (linkId) {
+        client.subscribedLinks.delete(linkId);
+        log(`Client unsubscribed from: linkId=${linkId}`, 'ws');
       }
       break;
 
     case 'ping':
-      client.ws.send(JSON.stringify({ type: 'pong', payload: { timestamp: Date.now() } }));
+      client.ws.send(JSON.stringify({ type: 'pong', data: { timestamp: Date.now() } }));
       break;
 
     default:
@@ -82,22 +96,28 @@ function handleMessage(client: WSClient, message: WSMessage) {
 export function broadcastSlotUpdate(linkId: string, slot: any) {
   const message = JSON.stringify({
     type: 'slot_update',
-    payload: { linkId, slot, timestamp: Date.now() },
+    linkId,
+    data: slot,
+    timestamp: Date.now(),
   });
 
+  let sentCount = 0;
   clients.forEach((client) => {
     if (client.subscribedLinks.has(linkId) && client.ws.readyState === WebSocket.OPEN) {
       client.ws.send(message);
+      sentCount++;
     }
   });
 
-  log(`Broadcast slot update for linkId=${linkId} to ${clients.size} clients`, 'ws');
+  log(`Broadcast slot update for linkId=${linkId} to ${sentCount} subscribers`, 'ws');
 }
 
 export function broadcastSettingsUpdate(passCode: string, settings: any) {
   const message = JSON.stringify({
     type: 'settings_update',
-    payload: { passCode, settings, timestamp: Date.now() },
+    passCode,
+    data: settings,
+    timestamp: Date.now(),
   });
 
   clients.forEach((client) => {
@@ -110,7 +130,9 @@ export function broadcastSettingsUpdate(passCode: string, settings: any) {
 export function broadcastNotification(passCode: string, notification: any) {
   const message = JSON.stringify({
     type: 'notification',
-    payload: { passCode, notification, timestamp: Date.now() },
+    passCode,
+    data: notification,
+    timestamp: Date.now(),
   });
 
   clients.forEach((client) => {
@@ -123,7 +145,8 @@ export function broadcastNotification(passCode: string, notification: any) {
 export function broadcastAdminAction(action: any, affectedCodes: string[]) {
   const message = JSON.stringify({
     type: 'admin_action',
-    payload: { action, timestamp: Date.now() },
+    data: action,
+    timestamp: Date.now(),
   });
 
   clients.forEach((client) => {
@@ -135,8 +158,8 @@ export function broadcastAdminAction(action: any, affectedCodes: string[]) {
   log(`Broadcast admin action to ${affectedCodes.length} affected codes`, 'ws');
 }
 
-export function broadcastToAll(type: string, payload: any) {
-  const message = JSON.stringify({ type, payload, timestamp: Date.now() });
+export function broadcastToAll(type: string, data: any) {
+  const message = JSON.stringify({ type, data, timestamp: Date.now() });
 
   clients.forEach((client) => {
     if (client.ws.readyState === WebSocket.OPEN) {
