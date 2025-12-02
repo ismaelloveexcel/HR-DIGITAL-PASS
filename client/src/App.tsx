@@ -3,6 +3,8 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { SoloHRToolbar } from "@/components/SoloHRToolbar";
 import Landing from "@/pages/landing";
 import PassPage from "@/pages/pass";
 import CandidateProfile from "@/pages/candidate-profile";
@@ -22,10 +24,13 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="light">
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+          <SoloHRToolbar />
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
