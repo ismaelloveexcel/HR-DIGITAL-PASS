@@ -15,6 +15,7 @@ export const candidates = pgTable("candidates", {
   department: text("department"),
   location: text("location"),
   status: varchar("status", { length: 20 }).notNull().default('Active'),
+  stage: integer("stage").notNull().default(1),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
