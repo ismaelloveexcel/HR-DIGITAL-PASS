@@ -99,7 +99,7 @@ export const PASS_MODE_CONFIG: Record<PassPersona, PassModeConfig> = {
   manager: {
     passTitle: 'Manager Pass',
     badge: 'Hiring Leader Brief',
-    caption: 'Control every approval touchpoint',
+    caption: 'Control every approval moment',
     accentClass: 'text-emerald-600',
     notification: '2 approvals awaiting',
     metaLabel: 'Manager ID',

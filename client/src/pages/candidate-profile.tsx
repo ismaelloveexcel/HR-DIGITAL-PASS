@@ -694,7 +694,7 @@ export default function CandidateProfile() {
               >
                  <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <Brain className="w-5 h-5 text-[#1E40AF]" />
-                    AI Evaluation
+                    Evaluation Summary
                  </h2>
                  <p className="text-sm text-slate-600 italic mb-6 bg-blue-50 p-3 rounded-xl border border-blue-100">
                    "{data.evaluation.summaryNotes}"

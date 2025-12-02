@@ -31,7 +31,7 @@ export default function Landing() {
   ];
 
   const soloChecklist = [
-    'Share the latest pass link before each touchpoint',
+    'Share the latest pass link before each check-in',
     'Log documents within 5 minutes of receiving them',
     'Send onboarding welcome pack 48h before start',
   ];
@@ -53,6 +53,45 @@ export default function Landing() {
     { label: 'Documents', detail: 'Uploads sync', enabled: true },
     { label: 'Availability', detail: 'Slots + QR', enabled: true },
     { label: 'Broadcast', detail: 'Digest emails', enabled: false },
+  ];
+
+  const workflowColumns = [
+    {
+      id: 'launch',
+      tag: 'Flow 01',
+      icon: Layers,
+      title: 'Launch wallet passes with context',
+      copy: 'Spin up candidate, manager, and onboarding views from one access code so nobody has to guess where information lives.',
+      items: [
+        'Persona buttons stay labelled — no hidden URLs.',
+        'Flip front/back views instead of rebuilding screens.',
+        'Each pass ships with QR, share, and console shortcuts.'
+      ],
+    },
+    {
+      id: 'sync',
+      tag: 'Flow 02',
+      icon: Link2,
+      title: 'Keep every update in one live thread',
+      copy: 'Linked slots, docs, and notes cascade instantly so the whole team sees the same state without extra broadcasts.',
+      items: [
+        'Availability edits ripple across personas in real time.',
+        'Candidates pick guided slots instead of empty calendars.',
+        'Console buttons jump to calls, mail, or the full profile.'
+      ],
+    },
+    {
+      id: 'automate',
+      tag: 'Flow 03',
+      icon: ShieldCheck,
+      title: 'Automate maintenance work',
+      copy: 'Toggle modules, reminders, and digests without engineers — the pass stays clean while ops stays fast.',
+      items: [
+        'Switch timeline, documents, availability, and insights per pass.',
+        'Preset nudges send reminders and digest summaries.',
+        'Action tips surface the next move on every dashboard.'
+      ],
+    },
   ];
 
   const slotColors: Record<SlotStatus, string> = {
@@ -97,10 +136,10 @@ export default function Landing() {
             </div>
 
             <div className="space-y-5">
-              <h1 className="text-4xl lg:text-5xl font-semibold text-slate-900 leading-tight">
+              <h1 className="text-4xl lg:text-5xl font-semibold text-slate-900 leading-tight text-balance">
                 One universal pass that keeps candidates, managers, and onboarding teams perfectly in sync.
               </h1>
-              <p className="text-slate-500 text-lg max-w-2xl">
+              <p className="text-slate-500 text-lg max-w-2xl text-balance">
                 Launch premium, QR-ready passes in seconds. Flip between front/back views, track documents, and broadcast updates without rebuilding UI every time.
               </p>
             </div>
@@ -131,32 +170,57 @@ export default function Landing() {
               </div>
             </form>
 
-            <div className="flex flex-wrap gap-3">
-              {passTypes.map((pass) => (
-                <button
-                  key={pass.code}
-                  onClick={() => setLocation(`/pass/${pass.code}`)}
-                  className="px-4 py-2 rounded-2xl bg-white border border-slate-200 text-left shadow-sm hover:border-blue-100 hover:text-[#1E40AF] transition-colors"
-                >
-                  <p className="text-sm font-semibold text-slate-700">{pass.label}</p>
-                  <p className="text-xs text-slate-400 flex items-center gap-2">
-                    <span className="font-mono tracking-tight">{pass.code}</span>
-                    <span className="text-[10px] uppercase tracking-[0.3em]">{pass.note}</span>
-                  </p>
-                </button>
-              ))}
-            </div>
-
-            <div className="grid sm:grid-cols-3 gap-3">
-              {adminStats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl bg-white border border-slate-100 p-4 shadow-sm">
-                  <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold mb-1">{stat.label}</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-[#1E40AF]">{stat.value}</span>
-                    <span className="text-[11px] text-slate-400">{stat.detail}</span>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/60 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Pass playbook</p>
+                    <p className="text-sm text-slate-500">Tap a persona and jump straight to its wallet.</p>
+                  </div>
+                  <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center">
+                    <Layers className="w-5 h-5" />
                   </div>
                 </div>
-              ))}
+                <div className="space-y-3">
+                  {passTypes.map((pass) => (
+                    <button
+                      key={pass.code}
+                      onClick={() => setLocation(`/pass/${pass.code}`)}
+                      className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-left hover:border-blue-100 hover:bg-blue-50/40 transition-colors flex items-center justify-between gap-4"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">{pass.label}</p>
+                        <p className="text-xs text-slate-500 leading-tight">{pass.note} · access code</p>
+                      </div>
+                      <span className="font-mono text-sm text-slate-600 whitespace-nowrap">{pass.code}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/60 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Status board</p>
+                    <p className="text-sm text-slate-500">Live numbers for the pod this week.</p>
+                  </div>
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <Clock3 className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  {adminStats.map((stat) => (
+                    <div key={stat.label} className="rounded-2xl bg-slate-50 border border-white p-4">
+                      <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400 font-semibold mb-1">{stat.label}</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-[#1E40AF]">{stat.value}</span>
+                        <span className="text-[11px] text-slate-500">{stat.detail}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-400">Open the console if you need the data behind any number.</p>
+              </div>
             </div>
 
             <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/70 space-y-4">
@@ -274,6 +338,45 @@ export default function Landing() {
           </motion.section>
         </div>
 
+        <section className="mt-16 space-y-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400 font-semibold">Feature map</p>
+              <h2 className="text-3xl font-semibold text-slate-900 text-balance">Solo HR organised into three clear flows.</h2>
+            </div>
+            <p className="text-sm text-slate-500 max-w-xl text-balance">
+              Launch once, stay synced, and let automations keep it tidy. Each block below explains what lives inside that flow.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {workflowColumns.map((column) => {
+              const Icon = column.icon;
+              return (
+                <div key={column.id} className="rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/50 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#1E40AF] flex items-center justify-center">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400 font-semibold">{column.tag}</p>
+                      <h3 className="text-lg font-semibold text-slate-900">{column.title}</h3>
+                    </div>
+                  </div>
+                  <p className="text-sm text-slate-500 leading-relaxed text-balance">{column.copy}</p>
+                  <ul className="space-y-2">
+                    {column.items.map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1E40AF] mt-2" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="mt-16 grid gap-6 lg:grid-cols-3">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -373,7 +476,7 @@ export default function Landing() {
             </ul>
             <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 text-sm text-slate-600">
               <p className="font-semibold text-slate-800 mb-1">Need more detail?</p>
-              <p className="text-slate-500">Open the full candidate console for AI insights, compensation data, and document control.</p>
+              <p className="text-slate-500">Open the full candidate console for detailed insights, compensation data, and document control.</p>
             </div>
             <button
               onClick={() => setLocation('/candidate-profile')}
