@@ -1504,6 +1504,11 @@ async function registerRoutes(
 
       for (const milestone of upcomingTimeline) {
         const milestoneDate = new Date(milestone.date);
+        // Validate that the date is valid before proceeding
+        if (isNaN(milestoneDate.getTime())) {
+          continue;
+        }
+        
         const reminderDate = new Date(milestoneDate.getTime() - 30 * 60 * 1000);
         
         if (reminderDate > new Date()) {
