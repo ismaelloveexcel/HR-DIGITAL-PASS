@@ -1,16 +1,30 @@
 import { useRoute } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
 import UniversalPass from '@/components/UniversalPass';
-import { MOCK_USERS } from '@/lib/mockData';
+import { getCandidateByCode } from '@/lib/api';
 import { Link } from 'wouter';
-import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function PassPage() {
   const [, params] = useRoute('/pass/:code');
   const code = params?.code ? decodeURIComponent(params.code).toUpperCase() : '';
   
-  const user = MOCK_USERS[code];
+  const { data: candidate, isLoading, error } = useQuery({
+    queryKey: ['candidate', code],
+    queryFn: () => getCandidateByCode(code),
+    enabled: !!code,
+  });
 
-  if (!user) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-subtle flex flex-col items-center justify-center p-4">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
+        <p className="text-slate-500">Loading pass...</p>
+      </div>
+    );
+  }
+
+  if (error || !candidate) {
     return (
       <div className="min-h-screen bg-subtle flex flex-col items-center justify-center p-4 text-center">
         <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
@@ -26,5 +40,5 @@ export default function PassPage() {
     );
   }
 
-  return <UniversalPass user={user} />;
+  return <UniversalPass candidate={candidate} />;
 }

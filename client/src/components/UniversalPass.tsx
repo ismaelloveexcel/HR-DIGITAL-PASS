@@ -23,14 +23,14 @@ import {
   FileCheck,
   ChevronRight
 } from 'lucide-react';
-import { UserData } from '@/lib/mockData';
+import type { CandidateWithRelations } from '@shared/schema';
 import { cn } from '@/lib/utils';
 import logo from '@assets/baynunah-logo_1764408063481.png';
 
 import { useLocation } from 'wouter';
 
 interface UniversalPassProps {
-  user: UserData;
+  candidate: CandidateWithRelations;
 }
 
 // Data for the back of the card
@@ -79,7 +79,7 @@ const CANDIDATE_BACK_DATA = {
   }
 };
 
-export default function UniversalPass({ user }: UniversalPassProps) {
+export default function UniversalPass({ candidate }: UniversalPassProps) {
   const [expanded, setExpanded] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -92,12 +92,12 @@ export default function UniversalPass({ user }: UniversalPassProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Reset states when user changes
+  // Reset states when candidate changes
   useEffect(() => {
     setExpanded(false);
     setIsFlipped(false);
     setActiveSection(null);
-  }, [user.code]);
+  }, [candidate.code]);
 
   const toggleExpand = () => setExpanded(!expanded);
   const toggleFlip = (e?: React.MouseEvent) => {
@@ -106,22 +106,12 @@ export default function UniversalPass({ user }: UniversalPassProps) {
     if (isFlipped) setActiveSection(null); // Reset section when flipping back to front
   };
 
-  const getRoleGradient = (role: string) => {
-    switch(role) {
-      case 'candidate': return 'from-blue-500/20 to-blue-600/5';
-      case 'manager': return 'from-purple-500/20 to-purple-600/5';
-      case 'onboarding': return 'from-emerald-500/20 to-emerald-600/5';
-      default: return 'from-gray-500/20 to-gray-600/5';
-    }
+  const getRoleGradient = () => {
+    return 'from-blue-500/20 to-blue-600/5';
   };
 
-  const getPassType = (role: string) => {
-    switch(role) {
-      case 'candidate': return 'CANDIDATE PASS';
-      case 'manager': return 'STAFF PASS';
-      case 'onboarding': return 'ONBOARDING PASS';
-      default: return 'UNIVERSAL PASS';
-    }
+  const getPassType = () => {
+    return 'CANDIDATE PASS';
   };
 
   const renderDetailContent = () => {
@@ -274,7 +264,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                     className="bg-white p-3 rounded-2xl w-40 aspect-square flex items-center justify-center mb-3 shadow-xl shadow-slate-200/50 shrink-0 border border-slate-50 cursor-pointer hover:scale-105 transition-transform"
                     onClick={() => setLocation('/candidate-profile')}
                    >
-                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${user.code}`} size={130} fgColor="#1e293b" />
+                      <QRCodeSVG value={`https://baynunah-pass.com/verify/${candidate.code}`} size={130} fgColor="#1e293b" />
                    </div>
 
                    <p className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold mb-2 shrink-0">OR enter code</p>
@@ -287,8 +277,8 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                    </div>
 
                    <div className="mb-3 shrink-0 space-y-0">
-                      <h3 className="text-[#1E40AF] text-base font-bold tracking-tight">{user.name}</h3>
-                      <p className="text-slate-500 font-mono text-[10px] tracking-wider">{user.code}</p>
+                      <h3 className="text-[#1E40AF] text-base font-bold tracking-tight">{candidate.name}</h3>
+                      <p className="text-slate-500 font-mono text-[10px] tracking-wider">{candidate.code}</p>
                    </div>
 
                    <div className="w-full h-px bg-slate-100 mb-3 shrink-0" />
@@ -341,7 +331,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 </button>
 
                 {/* Security Strip */}
-                <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50 rounded-t-[40px]", getRoleGradient(user.role))} />
+                <div className={cn("absolute top-0 left-0 w-full h-1 opacity-50 rounded-t-[40px]", getRoleGradient())} />
 
                 <div className="flex flex-col items-center w-full h-full pt-4">
                     {/* Logo */}
@@ -351,7 +341,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
 
                     {/* Pass Type */}
                     <p className="tracking-[0.2em] uppercase font-medium text-[14px] text-[#62748e] mb-8">
-                        {getPassType(user.role)}
+                        {getPassType()}
                     </p>
 
                     {/* QR Code Area */}
@@ -371,7 +361,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                             />
                             
                             <QRCodeSVG 
-                                value={`https://baynunah-pass.com/pass/${user.code}`} 
+                                value={`https://baynunah-pass.com/pass/${candidate.code}`} 
                                 size={140} 
                                 fgColor="#334155" 
                                 bgColor="transparent"
@@ -379,17 +369,17 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                         </div>
                         
                         <div className="absolute -bottom-3 bg-white px-4 py-1 rounded-full shadow-sm border border-slate-100 flex items-center gap-1.5">
-                            <span className={cn("w-1.5 h-1.5 rounded-full", user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{user.status}</span>
+                            <span className={cn("w-1.5 h-1.5 rounded-full", candidate.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400')} />
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{candidate.status}</span>
                         </div>
                     </div>
 
                     {/* Identity */}
                     <div className="space-y-1 mb-6">
-                        <h1 className="text-2xl font-bold tracking-tight text-[#1E40AF]">{user.name}</h1>
-                        <p className="text-slate-500 font-medium text-xs uppercase tracking-wider">{user.title}</p>
-                        {user.department && (
-                            <p className="text-slate-400 text-[10px] font-medium mt-1">{user.department}</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-[#1E40AF]">{candidate.name}</h1>
+                        <p className="text-slate-500 font-medium text-xs uppercase tracking-wider">{candidate.title}</p>
+                        {candidate.department && (
+                            <p className="text-slate-400 text-[10px] font-medium mt-1">{candidate.department}</p>
                         )}
                     </div>
 
@@ -571,10 +561,12 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             {/* Header */}
             <div className="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-100 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100" />
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center ring-2 ring-slate-100">
+                  <User className="w-6 h-6 text-slate-400" />
+                </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{user.name}</h3>
-                  <p className="text-xs text-slate-500">{user.code}</p>
+                  <h3 className="font-bold text-slate-900 text-sm">{candidate.name}</h3>
+                  <p className="text-xs text-slate-500">{candidate.code}</p>
                 </div>
               </div>
               <button 
@@ -588,56 +580,71 @@ export default function UniversalPass({ user }: UniversalPassProps) {
             <div className="flex-1 overflow-y-auto p-6 pb-32 space-y-8">
               {/* Stats Grid */}
               <div className="grid grid-cols-3 gap-3">
-                {user.stats?.map((stat, i) => (
-                  <motion.div 
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center gap-1"
-                  >
-                    <span className="text-xs text-slate-400 font-medium uppercase tracking-tight">{stat.label}</span>
-                    <span className="text-lg font-bold text-[#1E40AF]">{stat.value}</span>
-                  </motion.div>
-                ))}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0 }}
+                  className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center gap-1"
+                >
+                  <span className="text-xs text-slate-400 font-medium uppercase tracking-tight">Stage</span>
+                  <span className="text-lg font-bold text-[#1E40AF]">{candidate.timeline.find(t => t.status === 'current')?.title || 'In Progress'}</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center gap-1"
+                >
+                  <span className="text-xs text-slate-400 font-medium uppercase tracking-tight">Assessments</span>
+                  <span className="text-lg font-bold text-[#1E40AF]">{candidate.evaluations.length}</span>
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center gap-1"
+                >
+                  <span className="text-xs text-slate-400 font-medium uppercase tracking-tight">Documents</span>
+                  <span className="text-lg font-bold text-[#1E40AF]">{candidate.documents.length}</span>
+                </motion.div>
               </div>
 
               {/* Info Card */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
                 <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">Contact Information</h4>
                 
-                {user.location && (
+                {candidate.location && (
                   <div className="flex items-start gap-3 text-sm">
                     <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                       <MapPin className="w-4 h-4" />
                     </div>
                     <div className="pt-1.5">
                       <p className="text-slate-500">Location</p>
-                      <p className="text-slate-900 font-medium">{user.location}</p>
+                      <p className="text-slate-900 font-medium">{candidate.location}</p>
                     </div>
                   </div>
                 )}
 
-                {user.email && (
+                {candidate.email && (
                   <div className="flex items-start gap-3 text-sm">
                     <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                       <Mail className="w-4 h-4" />
                     </div>
                     <div className="pt-1.5">
                       <p className="text-slate-500">Email</p>
-                      <p className="text-slate-900 font-medium break-all">{user.email}</p>
+                      <p className="text-slate-900 font-medium break-all">{candidate.email}</p>
                     </div>
                   </div>
                 )}
 
-                {user.phone && (
+                {candidate.phone && (
                   <div className="flex items-start gap-3 text-sm">
                     <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                       <Phone className="w-4 h-4" />
                     </div>
                     <div className="pt-1.5">
                       <p className="text-slate-500">Phone</p>
-                      <p className="text-slate-900 font-medium">{user.phone}</p>
+                      <p className="text-slate-900 font-medium">{candidate.phone}</p>
                     </div>
                   </div>
                 )}
@@ -648,7 +655,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider px-1">Timeline</h4>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                   <div className="relative pl-2 space-y-8 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
-                    {user.timeline?.map((item, i) => (
+                    {candidate.timeline.map((item, i) => (
                       <div key={i} className="relative flex gap-4">
                         <div className={cn(
                           "w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 z-10 ring-4 ring-white", 
@@ -674,7 +681,7 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                 <NavItem icon={<Home className="w-5 h-5" />} active />
                 <NavItem icon={<ListTodo className="w-5 h-5" />} />
                 <div className="w-12 h-12 bg-[#1E40AF] rounded-full -mt-8 flex items-center justify-center text-white shadow-lg shadow-blue-900/30 ring-4 ring-white">
-                  <QRCodeSVG value={user.code} size={24} fgColor="#ffffff" bgColor="transparent" />
+                  <QRCodeSVG value={candidate.code} size={24} fgColor="#ffffff" bgColor="transparent" />
                 </div>
                 <NavItem icon={<CheckCircle2 className="w-5 h-5" />} />
                 <NavItem icon={<Settings className="w-5 h-5" />} />
