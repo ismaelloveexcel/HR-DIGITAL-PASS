@@ -45,7 +45,7 @@ export const MOCK_USERS: Record<string, UserData> = {
       { label: 'Score', value: '92%' }
     ],
     timeline: [
-      { title: 'Application Recieved', date: 'Nov 25', status: 'completed' },
+      { title: 'Application Received', date: 'Nov 25', status: 'completed' },
       { title: 'Screening Call', date: 'Nov 26', status: 'completed' },
       { title: 'Portfolio Review', date: 'Nov 28', status: 'completed' },
       { title: 'Final Interview', date: 'Today, 2:00 PM', status: 'current' }
