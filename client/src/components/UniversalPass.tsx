@@ -934,10 +934,10 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
               {/* FRONT FACE */}
               <div 
                 className={cn(
-                  "absolute inset-0 backface-hidden rounded-[40px] p-6 flex flex-col group pass-card transition-colors duration-500 border border-transparent",
+                  "absolute inset-0 backface-hidden rounded-[40px] p-5 flex flex-col group pass-card transition-colors duration-500 border border-transparent overflow-hidden",
                   themeToken.card
                 )}
-                style={{ backfaceVisibility: 'hidden' }}
+                style={{ backfaceVisibility: 'hidden', boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff' }}
               >
                 <div className={cn("absolute top-0 left-0 w-full h-1 opacity-60 rounded-t-[40px]", getRoleGradient())} />
                 <button
@@ -956,7 +956,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                   <RotateCw className="w-4 h-4" />
                 </button>
 
-                <div className="flex flex-col w-full h-full space-y-5 pt-4">
+                <div className="flex flex-col w-full h-full space-y-3 pt-8 overflow-hidden">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-2xl bg-white/80 shadow-inner shadow-white/60 flex items-center justify-center">
@@ -976,141 +976,92 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                     </button>
                   </div>
 
-                  <div className="w-full rounded-[30px] bg-white/80 dark:bg-slate-900/40 border border-white/50 dark:border-slate-700/60 p-5 text-left shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">{modeConfig.badge}</p>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-2">{blueprint.personal.name}</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-300">{identitySecondary}</p>
-                    <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-300">
-                      <span>{modeConfig.caption}</span>
-                      <span className="font-mono tracking-wide text-slate-700 dark:text-slate-100">{identityMeta}</span>
+                  <div className="w-full rounded-[24px] bg-white/80 dark:bg-slate-900/40 border border-white/50 dark:border-slate-700/60 p-4 text-left shadow-[0_10px_40px_rgba(15,23,42,0.06)]">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-semibold">{modeConfig.badge}</p>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">{blueprint.personal.name}</h1>
+                    <p className="text-xs text-slate-500 dark:text-slate-300">{identitySecondary}</p>
+                    <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400">
+                      <span className="font-mono tracking-wide">{identityMeta}</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="col-span-2 rounded-2xl bg-white/70 dark:bg-slate-900/40 border border-white/50 dark:border-slate-700/60 p-4">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Current Stage</p>
-                      <p className="text-lg font-semibold text-slate-900 dark:text-white">{quickStageLabel}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{blueprint.stage.history.length} milestones logged</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2 rounded-xl bg-white/70 dark:bg-slate-900/40 border border-white/50 dark:border-slate-700/60 p-3">
+                      <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Current Stage</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{quickStageLabel}</p>
                     </div>
-                    <div className="rounded-2xl bg-white/60 dark:bg-slate-900/30 border border-white/40 dark:border-slate-700/50 p-4 flex flex-col justify-between">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Status Required</p>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{quickStageStatus}</p>
+                    <div className="rounded-xl bg-white/60 dark:bg-slate-900/30 border border-white/40 dark:border-slate-700/50 p-3 flex flex-col justify-center">
+                      <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Status</p>
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-100 truncate">{quickStageStatus}</p>
                     </div>
                   </div>
 
-                  <div className="w-full rounded-[28px] bg-white/70 dark:bg-slate-900/40 border border-white/50 dark:border-slate-800/60 p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Journey Preview</span>
-                      <span className="text-[10px] text-slate-400">Menu → Full timeline</span>
-                    </div>
-                    <div className="flex gap-2">
-                      {timelinePreview.map((node) => (
-                        <div key={node.label} className="flex-1">
+                  <div className="w-full rounded-xl bg-white/70 dark:bg-slate-900/40 border border-white/50 dark:border-slate-800/60 p-3">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-semibold mb-2">Journey</p>
+                    <div className="flex gap-1.5">
+                      {timelinePreview.slice(0, 5).map((node) => (
+                        <div key={node.label} className="flex-1 min-w-0">
                           <div
                             className={cn(
-                              "h-2 rounded-full transition-colors",
+                              "h-1.5 rounded-full transition-colors",
                               node.status === 'completed' ? 'bg-emerald-400' : node.status === 'current' ? 'bg-[#1E40AF]' : 'bg-slate-200'
                             )}
                           />
-                          <p className="mt-1 text-[9px] font-semibold uppercase tracking-widest text-slate-400 truncate">{node.label}</p>
+                          <p className="mt-0.5 text-[8px] font-medium text-slate-400 truncate">{node.label}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="w-full rounded-[32px] bg-white/70 dark:bg-slate-900/40 border border-white/40 dark:border-slate-800/60 p-4 flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Wallet QR</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Tap to share full profile</p>
-                      </div>
+                  <div className="w-full rounded-xl bg-white/70 dark:bg-slate-900/40 border border-white/40 dark:border-slate-800/60 p-3">
+                    <div className="flex items-center gap-3">
                       <div
-                        className="relative w-20 h-20 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 cursor-pointer"
+                        className="relative w-16 h-16 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5 cursor-pointer flex-shrink-0"
                         onClick={() => setShowVerification(true)}
                       >
-                        <QRCodeSVG value={`https://baynunah-pass.com/pass/${candidate.code}`} size={64} fgColor="#1f2937" />
-                        <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+                        <QRCodeSVG value={`https://baynunah-pass.com/pass/${candidate.code}`} size={52} fgColor="#1f2937" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Wallet QR</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 truncate">Tap to verify</p>
+                        <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                           {candidate.status}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        disabled={!canCall}
-                        onClick={() => canCall && typeof window !== 'undefined' && window.open(`tel:${candidate.phone}`, '_self')}
-                        className="flex-1 px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-[12px] font-semibold text-slate-600 dark:text-slate-300 hover:border-[#1E40AF] transition-colors disabled:opacity-40"
-                      >
-                        Call
-                      </button>
-                      <button
-                        disabled={!canEmail}
-                        onClick={() => canEmail && typeof window !== 'undefined' && window.open(`mailto:${candidate.email}?subject=Baynunah Pass Update`, '_self')}
-                        className="flex-1 px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-[12px] font-semibold text-slate-600 dark:text-slate-300 hover:border-[#1E40AF] transition-colors disabled:opacity-40"
-                      >
-                        Email
-                      </button>
-                      <button
-                        onClick={() => setLocation('/candidate-profile')}
-                        className="flex-1 px-3 py-2 rounded-2xl border border-[#1E40AF]/30 bg-[#1E40AF]/10 text-[12px] font-semibold text-[#1E40AF] hover:bg-[#1E40AF]/20 transition-colors"
-                      >
-                        Profile
-                      </button>
-                    </div>
                   </div>
 
                   {passSettings.modules.availability && primaryLinkedSlot && (
-                    <div className="w-full rounded-[28px] border border-white/40 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/40 p-4 shadow-inner">
+                    <div className="w-full rounded-xl border border-white/40 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/40 p-3">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">Linked availability</p>
-                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{primaryLinkedSlot.link.title}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">{primaryLinkedSlot.slot.date} · {primaryLinkedSlot.slot.time}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[9px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Linked</p>
+                          <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{primaryLinkedSlot.slot.date} · {primaryLinkedSlot.slot.time}</p>
                         </div>
                         <button
                           onClick={() => {
                             setIsFlipped(true);
                             setActiveSection('linked');
                           }}
-                          className="px-3 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 hover:border-[#1E40AF]"
+                          className="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-semibold text-slate-600 hover:border-[#1E40AF]"
                         >
                           Manage
                         </button>
                       </div>
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {primaryLinkedSlot.link.slots.map((slot) => {
-                          const isSelected = slot.candidateCode === candidate.code && slot.status === 'booked';
-                          const disabled = slot.status === 'held' || (slot.status === 'booked' && !isSelected);
-                          return (
-                            <button
-                              key={slot.id}
-                              onClick={() => handleCandidateSlotInteraction(primaryLinkedSlot.link, slot)}
-                              disabled={disabled}
-                              className={cn(
-                                "px-3 py-1.5 rounded-full border text-[11px] font-semibold",
-                                isSelected
-                                  ? "bg-[#1E40AF] text-white border-[#1E40AF]"
-                                  : "border-slate-200 text-slate-500 hover:border-[#1E40AF]/40 disabled:opacity-40"
-                              )}
-                            >
-                              {slot.label}
-                            </button>
-                          );
-                        })}
-                      </div>
                     </div>
                   )}
 
-                  <div className="mt-auto">
-                    <div className="flex items-center gap-3">
-                      {footerButtons.map((button) => {
+                  <div className="mt-auto pt-2">
+                    <div className="flex items-center gap-2">
+                      {footerButtons.slice(0, 2).map((button) => {
                         const Icon = button.icon;
                         return (
                           <button
                             key={button.label}
                             onClick={() => handleFooterAction(button.action)}
-                            className="flex-1 px-4 py-3 rounded-2xl border border-white/40 dark:border-slate-800/60 bg-white/75 dark:bg-slate-900/40 text-sm font-semibold text-slate-700 dark:text-slate-100 flex items-center justify-center gap-2 shadow-sm hover:border-[#1E40AF]/50 transition-colors"
+                            className="flex-1 px-3 py-2.5 rounded-xl border border-white/40 dark:border-slate-800/60 bg-white/75 dark:bg-slate-900/40 text-xs font-semibold text-slate-700 dark:text-slate-100 flex items-center justify-center gap-1.5 shadow-sm hover:border-[#1E40AF]/50 transition-colors"
                           >
-                            <Icon className="w-4 h-4" />
+                            <Icon className="w-3.5 h-3.5" />
                             {button.label}
                           </button>
                         );
@@ -1122,13 +1073,15 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
               {/* BACK FACE (2x2 Menu or Detail) */}
               <div 
                 className={cn(
-                  "absolute inset-0 backface-hidden rounded-[40px] p-6 flex flex-col transition-colors duration-500",
+                  "absolute inset-0 backface-hidden rounded-[40px] p-5 flex flex-col transition-colors duration-500 overflow-hidden",
                   passSettings.theme === 'tech' ? "bg-[#020617] text-slate-100" : "bg-[#f8fafc]"
                 )}
                 style={{ 
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
-                    boxShadow: '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
+                    boxShadow: passSettings.theme === 'dark' || passSettings.theme === 'tech' 
+                      ? '20px 20px 60px #0a0a0a, -20px -20px 60px #1a1a2e' 
+                      : '20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff'
                 }}
               >
                 {/* Header */}
