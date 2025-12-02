@@ -453,16 +453,16 @@ export default function UniversalPass({ user }: UniversalPassProps) {
                     {activeSection ? (
                          <button 
                             onClick={() => setActiveSection(null)}
-                            className="p-2 -ml-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors flex items-center gap-1"
+                            className="p-2 -ml-2 rounded-full text-slate-400 hover:text-[#1E40AF] hover:bg-blue-50 transition-colors flex items-center gap-1 group"
                         >
-                            <ArrowRight className="w-4 h-4 rotate-180" />
-                            <span className="text-xs font-medium">Back</span>
+                            <div className="w-6 h-6 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center group-hover:border-blue-100">
+                                <ArrowRight className="w-3 h-3 rotate-180" />
+                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Back</span>
                         </button>
                     ) : (
                         <div className="flex items-center justify-center w-full relative">
-                            <img src={logo} alt="Baynunah" className="h-5 object-contain opacity-80" />
-                            {/* Triangle Accent from image */}
-                            <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-slate-800 absolute -right-4 top-1/2 -translate-y-1/2 opacity-0" />
+                            <img src={logo} alt="Baynunah" className="h-5 object-contain invert opacity-80" />
                         </div>
                     )}
                     
