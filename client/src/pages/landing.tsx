@@ -476,7 +476,7 @@ export default function Landing() {
             </ul>
             <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 text-sm text-slate-600">
               <p className="font-semibold text-slate-800 mb-1">Need more detail?</p>
-              <p className="text-slate-500">Open the full candidate console for AI insights, compensation data, and document control.</p>
+              <p className="text-slate-500">Open the full candidate console for detailed insights, compensation data, and document control.</p>
             </div>
             <button
               onClick={() => setLocation('/candidate-profile')}
