@@ -6,6 +6,9 @@
 import type { CandidateWithRelations, TimelineEntry, Evaluation, Document } from '@shared/schema';
 import { MOCK_USERS, type UserData } from './mockData';
 
+// Constants
+const DEFAULT_CANDIDATE_STAGE = 1;
+
 export type PassPersona = 'candidate' | 'manager' | 'employee';
 export type PassTheme = 'light' | 'dark' | 'tech';
 
@@ -489,7 +492,7 @@ function mockUserToCandidate(user: UserData): CandidateWithRelations {
     department: user.department ?? null,
     location: user.location ?? null,
     status: user.status,
-    stage: 1,
+    stage: DEFAULT_CANDIDATE_STAGE,
     createdAt: now,
     timeline,
     evaluations,
@@ -542,7 +545,7 @@ export function createCandidate(candidate: Partial<CandidateWithRelations> & { c
     department: candidate.department ?? null,
     location: candidate.location ?? null,
     status: candidate.status ?? 'Active',
-    stage: candidate.stage ?? 1,
+    stage: candidate.stage ?? DEFAULT_CANDIDATE_STAGE,
     createdAt: now,
     timeline: candidate.timeline ?? [],
     evaluations: candidate.evaluations ?? [],
