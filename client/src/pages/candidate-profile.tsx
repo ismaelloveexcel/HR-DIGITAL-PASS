@@ -17,9 +17,12 @@ import {
   Download,
   Edit2,
   X,
-  Check
+  Check,
+  Upload
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import { usePassData } from '@/hooks/usePassData';
 import logo from '@assets/baynunah-logo_1764408063481.png';
 
 // Mock data based on user prompt
@@ -135,6 +138,8 @@ export default function CandidateProfile() {
   const [, setLocation] = useLocation();
   const [data, setData] = useState(CANDIDATE_DATA);
   const [showEditModal, setShowEditModal] = useState(false);
+  const { toast } = useToast();
+  const { downloadData, uploadData } = usePassData();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -191,6 +196,39 @@ export default function CandidateProfile() {
     
     setData(updatedData);
     setShowEditModal(false);
+    
+    // Show success toast
+    toast({
+      title: 'Profile Updated',
+      description: 'Your changes have been saved successfully.',
+      variant: 'default',
+    });
+  };
+
+  const handleExport = () => {
+    downloadData(`candidate-${data.positionInfo.candidateId}-${new Date().toISOString().split('T')[0]}.json`);
+    toast({
+      title: 'Export Successful',
+      description: 'Profile data has been downloaded.',
+      variant: 'default',
+    });
+  };
+
+  const handleImport = async () => {
+    const success = await uploadData();
+    if (success) {
+      toast({
+        title: 'Import Successful',
+        description: 'Data has been loaded from file.',
+        variant: 'default',
+      });
+    } else {
+      toast({
+        title: 'Import Failed',
+        description: 'Could not import data. Please check the file format.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -530,15 +568,25 @@ export default function CandidateProfile() {
                </div>
 
                <div className="flex gap-3 pt-2">
-                  <a href={data.basicInfo.linkedInProfile} target="_blank" rel="noreferrer" className="p-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+                  <a href={data.basicInfo.linkedInProfile} target="_blank" rel="noreferrer" className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
                     <Linkedin className="w-5 h-5" />
                   </a>
-                  <a href={data.basicInfo.otherSocialLinks.portfolio} target="_blank" rel="noreferrer" className="p-2 rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors">
+                  <a href={data.basicInfo.otherSocialLinks.portfolio} target="_blank" rel="noreferrer" className="p-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors">
                     <Globe className="w-5 h-5" />
                   </a>
-                  <button className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors flex items-center gap-2 shadow-lg shadow-slate-900/20">
+                  <button 
+                    onClick={handleExport}
+                    className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 dark:hover:bg-slate-600 transition-colors flex items-center gap-2 shadow-lg shadow-slate-900/20"
+                  >
                     <Download className="w-4 h-4" />
-                    Download CV
+                    Export Data
+                  </button>
+                  <button 
+                    onClick={handleImport}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 dark:bg-emerald-700 text-white text-sm font-medium hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-colors flex items-center gap-2 shadow-lg shadow-emerald-900/20"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Import
                   </button>
                </div>
              </div>

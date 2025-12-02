@@ -27,66 +27,167 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ==========================================================================
+   Theme Variables - Light Mode (Default)
+   ========================================================================== */
 :root {
-  /* Clean, premium white aesthetic */
-  --background: 0 0% 100%; /* #FFFFFF */
-  --foreground: 222 47% 11%; /* Dark blue-grey for text */
-
+  /* Core colors */
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  
   /* Primary: #1E40AF */
   --primary: 226 71% 40%;
   --primary-foreground: 210 40% 98%;
-
-  /* Secondary/Neutral: #F3F4F6 */
+  
+  /* Secondary/Neutral */
   --secondary: 210 40% 96%;
   --secondary-foreground: 222 47% 11%;
-
-  /* Muted: #6B7280 for text, lighter for bg */
+  
+  /* Muted */
   --muted: 210 40% 96.1%;
   --muted-foreground: 215 16% 47%;
-
-  /* Accent: Glassy look */
+  
+  /* Accent */
   --accent: 210 40% 96.1%;
   --accent-foreground: 222 47% 11%;
-
-  /* Success: #059669 */
+  
+  /* Status colors */
   --success: 161 94% 30%;
   --success-foreground: 210 40% 98%;
-
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-
+  
+  /* UI elements */
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 226 71% 40%;
-
-  --radius: 0.75rem; /* 12px */
+  
+  /* Sizing */
+  --radius: 0.75rem;
   --font-sans: 'Inter', sans-serif;
+  
+  /* Pass card specific */
+  --pass-bg: 0 0% 100%;
+  --pass-shadow: 20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff;
+  --pass-border: 214.3 31.8% 91.4%;
 }
 
+/* ==========================================================================
+   Theme Variables - Dark Mode
+   ========================================================================== */
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 14%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 14%;
+  --popover-foreground: 210 40% 98%;
+  
+  --primary: 217 91% 60%;
+  --primary-foreground: 222 47% 11%;
+  
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --border: 217 33% 22%;
+  --input: 217 33% 22%;
+  --ring: 217 91% 60%;
+  
+  /* Pass card specific - dark */
+  --pass-bg: 222 47% 14%;
+  --pass-shadow: 20px 20px 60px #0c1220, -20px -20px 60px #1a2640;
+  --pass-border: 217 33% 22%;
+}
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
 body {
-  background-color: hsl(var(--background)); /* #F9FAFB in some areas, handled by utilities */
+  background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Utility for the slightly off-white background mentioned in specs */
+/* ==========================================================================
+   BEM Component Utilities
+   ========================================================================== */
+
+/* Background utilities */
 .bg-subtle {
   background-color: #F9FAFB;
 }
 
-/* Glassmorphism utilities */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.7);
+.dark .bg-subtle {
+  background-color: hsl(222 47% 8%);
+}
+
+/* Glassmorphism - Block: glass */
+.glass {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  transition: all 0.2s ease;
+}
+
+.glass--panel {
+  background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
 }
 
-.glass-button {
+.glass--button {
   background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass--button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.02);
+}
+
+.dark .glass--panel {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark .glass--button {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.3);
+}
+
+.dark .glass--button:hover {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+/* Legacy class support - redefine instead of @apply */
+.glass-panel {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.glass-button {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.2s ease;
 }
@@ -94,4 +195,117 @@ body {
 .glass-button:hover {
   background: rgba(255, 255, 255, 0.95);
   transform: scale(1.02);
+}
+
+.dark .glass-panel {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark .glass-button {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.3);
+}
+
+.dark .glass-button:hover {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+/* ==========================================================================
+   Pass Card Component - Block: pass-card
+   ========================================================================== */
+.pass-card {
+  background-color: hsl(var(--pass-bg));
+  box-shadow: var(--pass-shadow);
+  border-radius: 40px;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.pass-card__header {
+  padding: 1rem 2rem;
+}
+
+.pass-card__body {
+  padding: 0 2rem 2rem;
+}
+
+.pass-card__qr {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1rem;
+  box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff;
+}
+
+.dark .pass-card__qr {
+  background: hsl(var(--card));
+  box-shadow: inset 2px 2px 5px #0c1220, inset -2px -2px 5px #1e2b42;
+}
+
+/* ==========================================================================
+   Custom Scrollbar
+   ========================================================================== */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--border));
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+@keyframes scan-line {
+  0%, 100% { 
+    top: 10%;
+    opacity: 0;
+  }
+  50% { 
+    top: 90%;
+    opacity: 1;
+  }
+}
+
+.animate-scan {
+  animation: scan-line 3s linear infinite;
+}
+
+/* ==========================================================================
+   Responsive Utilities
+   ========================================================================== */
+@media (max-width: 640px) {
+  .pass-card {
+    border-radius: 32px;
+  }
+  
+  .pass-card__header,
+  .pass-card__body {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
 }
