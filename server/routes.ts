@@ -5,7 +5,10 @@ import {
   insertCandidateSchema, 
   insertTimelineEntrySchema,
   insertEvaluationSchema,
-  insertDocumentSchema 
+  insertDocumentSchema,
+  updateCandidateSchema,
+  updateTimelineEntrySchema,
+  updateEvaluationSchema
 } from "@shared/schema";
 
 export async function registerRoutes(
@@ -80,14 +83,23 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Invalid candidate ID" });
       }
 
-      const candidate = await storage.updateCandidate(id, req.body);
+      const validatedData = updateCandidateSchema.parse(req.body);
+      
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "No valid fields to update" });
+      }
+
+      const candidate = await storage.updateCandidate(id, validatedData);
       if (!candidate) {
         return res.status(404).json({ error: "Candidate not found" });
       }
       
       res.json(candidate);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating candidate:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Invalid update data", details: error.errors });
+      }
       res.status(500).json({ error: "Failed to update candidate" });
     }
   });
@@ -157,14 +169,23 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Invalid timeline entry ID" });
       }
 
-      const entry = await storage.updateTimelineEntry(id, req.body);
+      const validatedData = updateTimelineEntrySchema.parse(req.body);
+      
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "No valid fields to update" });
+      }
+
+      const entry = await storage.updateTimelineEntry(id, validatedData);
       if (!entry) {
         return res.status(404).json({ error: "Timeline entry not found" });
       }
       
       res.json(entry);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating timeline entry:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Invalid update data", details: error.errors });
+      }
       res.status(500).json({ error: "Failed to update timeline entry" });
     }
   });
@@ -234,14 +255,23 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Invalid evaluation ID" });
       }
 
-      const evaluation = await storage.updateEvaluation(id, req.body);
+      const validatedData = updateEvaluationSchema.parse(req.body);
+      
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "No valid fields to update" });
+      }
+
+      const evaluation = await storage.updateEvaluation(id, validatedData);
       if (!evaluation) {
         return res.status(404).json({ error: "Evaluation not found" });
       }
       
       res.json(evaluation);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating evaluation:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Invalid update data", details: error.errors });
+      }
       res.status(500).json({ error: "Failed to update evaluation" });
     }
   });

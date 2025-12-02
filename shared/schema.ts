@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, serial, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -21,19 +21,19 @@ export const candidates = pgTable("candidates", {
 // Timeline entries for recruitment stages
 export const timelineEntries = pgTable("timeline_entries", {
   id: serial("id").primaryKey(),
-  candidateId: serial("candidate_id").notNull().references(() => candidates.id, { onDelete: 'cascade' }),
+  candidateId: integer("candidate_id").notNull().references(() => candidates.id, { onDelete: 'cascade' }),
   title: text("title").notNull(),
   date: text("date").notNull(),
-  status: varchar("status", { length: 20 }).notNull(), // 'completed', 'current', 'upcoming'
-  order: serial("order").notNull(),
+  status: varchar("status", { length: 20 }).notNull(),
+  order: integer("order").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // Evaluations/Assessments
 export const evaluations = pgTable("evaluations", {
   id: serial("id").primaryKey(),
-  candidateId: serial("candidate_id").notNull().references(() => candidates.id, { onDelete: 'cascade' }),
-  type: text("type").notNull(), // 'Technical', 'Cultural Fit', etc.
+  candidateId: integer("candidate_id").notNull().references(() => candidates.id, { onDelete: 'cascade' }),
+  type: text("type").notNull(),
   score: text("score"),
   notes: text("notes"),
   evaluator: text("evaluator"),
@@ -44,9 +44,9 @@ export const evaluations = pgTable("evaluations", {
 // Documents
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
-  candidateId: serial("candidate_id").notNull().references(() => candidates.id, { onDelete: 'cascade' }),
+  candidateId: integer("candidate_id").notNull().references(() => candidates.id, { onDelete: 'cascade' }),
   title: text("title").notNull(),
-  type: text("type").notNull(), // 'CV', 'Portfolio', 'Certificate', etc.
+  type: text("type").notNull(),
   url: text("url"),
   uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
 });
@@ -100,15 +100,31 @@ export const insertDocumentSchema = createInsertSchema(documents).omit({
   uploadedAt: true,
 });
 
+// Update schemas (partial versions for PATCH requests)
+export const updateCandidateSchema = insertCandidateSchema.partial().omit({
+  code: true,
+});
+
+export const updateTimelineEntrySchema = insertTimelineEntrySchema.partial().omit({
+  candidateId: true,
+});
+
+export const updateEvaluationSchema = insertEvaluationSchema.partial().omit({
+  candidateId: true,
+});
+
 // Types
 export type Candidate = typeof candidates.$inferSelect;
 export type InsertCandidate = z.infer<typeof insertCandidateSchema>;
+export type UpdateCandidate = z.infer<typeof updateCandidateSchema>;
 
 export type TimelineEntry = typeof timelineEntries.$inferSelect;
 export type InsertTimelineEntry = z.infer<typeof insertTimelineEntrySchema>;
+export type UpdateTimelineEntry = z.infer<typeof updateTimelineEntrySchema>;
 
 export type Evaluation = typeof evaluations.$inferSelect;
 export type InsertEvaluation = z.infer<typeof insertEvaluationSchema>;
+export type UpdateEvaluation = z.infer<typeof updateEvaluationSchema>;
 
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
