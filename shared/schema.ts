@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -135,3 +135,110 @@ export type CandidateWithRelations = Candidate & {
   evaluations: Evaluation[];
   documents: Document[];
 };
+
+// ============================================================================
+// Interview Slots - Real-time slot booking system
+// ============================================================================
+export const interviewSlots = pgTable("interview_slots", {
+  id: serial("id").primaryKey(),
+  linkId: varchar("link_id", { length: 50 }).notNull(),
+  label: text("label").notNull(),
+  date: text("date").notNull(),
+  time: text("time").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default('open'),
+  managerCode: varchar("manager_code", { length: 20 }).notNull(),
+  candidateCode: varchar("candidate_code", { length: 20 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertInterviewSlotSchema = createInsertSchema(interviewSlots).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateInterviewSlotSchema = insertInterviewSlotSchema.partial();
+
+export type InterviewSlot = typeof interviewSlots.$inferSelect;
+export type InsertInterviewSlot = z.infer<typeof insertInterviewSlotSchema>;
+export type UpdateInterviewSlot = z.infer<typeof updateInterviewSlotSchema>;
+
+// ============================================================================
+// Pass Settings - Persisted automation toggles per pass
+// ============================================================================
+export const passSettings = pgTable("pass_settings", {
+  id: serial("id").primaryKey(),
+  passCode: varchar("pass_code", { length: 20 }).notNull().unique(),
+  theme: varchar("theme", { length: 20 }).notNull().default('light'),
+  moduleTimeline: boolean("module_timeline").notNull().default(true),
+  moduleDocuments: boolean("module_documents").notNull().default(true),
+  moduleAvailability: boolean("module_availability").notNull().default(true),
+  moduleInteractions: boolean("module_interactions").notNull().default(true),
+  automationReminders: boolean("automation_reminders").notNull().default(true),
+  automationDocs: boolean("automation_docs").notNull().default(true),
+  automationDigest: boolean("automation_digest").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertPassSettingsSchema = createInsertSchema(passSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updatePassSettingsSchema = insertPassSettingsSchema.partial().omit({
+  passCode: true,
+});
+
+export type PassSettingsRecord = typeof passSettings.$inferSelect;
+export type InsertPassSettings = z.infer<typeof insertPassSettingsSchema>;
+export type UpdatePassSettings = z.infer<typeof updatePassSettingsSchema>;
+
+// ============================================================================
+// Notifications - In-app notifications and reminders
+// ============================================================================
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  passCode: varchar("pass_code", { length: 20 }).notNull(),
+  type: varchar("type", { length: 30 }).notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  priority: varchar("priority", { length: 20 }).notNull().default('normal'),
+  read: boolean("read").notNull().default(false),
+  actionUrl: text("action_url"),
+  scheduledFor: timestamp("scheduled_for"),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+// ============================================================================
+// Admin Actions Log - Track admin batch operations
+// ============================================================================
+export const adminActions = pgTable("admin_actions", {
+  id: serial("id").primaryKey(),
+  actionType: varchar("action_type", { length: 50 }).notNull(),
+  targetCodes: text("target_codes").array().notNull(),
+  performedBy: varchar("performed_by", { length: 50 }).notNull(),
+  payload: jsonb("payload"),
+  status: varchar("status", { length: 20 }).notNull().default('completed'),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertAdminActionSchema = createInsertSchema(adminActions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type AdminAction = typeof adminActions.$inferSelect;
+export type InsertAdminAction = z.infer<typeof insertAdminActionSchema>;

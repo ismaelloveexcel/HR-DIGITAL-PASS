@@ -1,0 +1,64 @@
+I have a full-stack TypeScript project (React/Vite frontend, Express backend) for digital HR passes.
+The current version covers all core UI and structure, but the following feature gaps need to be addressed:
+
+Requirements:
+
+Live Interview Slot Sync:
+
+Make interview slot selection real-time across multiple users.
+
+When a candidate selects or updates a slot, all relevant users (candidates/managers) see the update immediately (WebSocket, or polling as fallback).
+
+Automation Toggles (Admin/Toolbar):
+
+Connect the existing automation toggles (Timeline, Documents, Availability, Broadcast) in the admin toolbar to backend endpoints.
+
+Changes to automations should persist and be reflected in all active user sessions.
+
+Milestone Reminders & Notifications:
+
+Implement backend logic for scheduled reminders (email, push, or in-app) before next interview or milestone.
+
+When an event is coming up, send a notification automatically based on the schedule set in the pass.
+
+Admin Actions:
+
+Make admin actions (like batch onboarding, live broadcast, etc.) fully functional.
+
+All changes made by admin/toolkit should reflect immediately for affected users.
+
+README:
+
+Add a README with:
+
+How to install/run locally and on Replit
+
+How to configure env variables (for notifications, DB, etc.)
+
+How to trigger/test all new features
+
+Stack/Constraints:
+
+Use existing project structure (/client, /server, /shared).
+
+Can use a lightweight DB (e.g., SQLite, Supabase, or Replit DB) if needed.
+
+For notifications, if you can’t use email/SMS on Replit, implement in-app toasts or banners as fallback.
+
+No need to change visuals, just complete the feature logic.
+
+Checklist (deliverables):
+
+ Real-time slot selection
+
+ Persisted automation toggles
+
+ Scheduled reminders/notifications
+
+ Working admin actions
+
+ Updated README
+
+Output:
+The updated project should work end-to-end with all features above—on Replit or local.
+If any Replit limitation blocks external notifications, document the workaround and use in-app messaging instead.
