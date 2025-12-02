@@ -30,6 +30,39 @@ A minimalist, persona-aware digital pass system featuring QR-based wallet cards 
 - **Real-Time**: WebSocket (ws)
 - **Styling**: Claymorphism/Soft UI design system
 
+## Server Architecture
+
+This project supports two server architectures:
+
+### 1. Modular Structure (Default - Recommended for Development)
+The server is split into focused modules in the `server/` directory:
+- `index.ts` - Main entry point
+- `routes.ts` - API route handlers
+- `db.ts` - Database connection
+- `storage.ts` - Data access layer
+- `websocket.ts` - WebSocket server
+- `scheduler.ts` - Background jobs
+- `static.ts` - Static file serving
+- `vite.ts` - Dev server integration
+
+**Usage:**
+```bash
+npm run dev        # Development mode
+npm run build      # Production build
+npm start          # Run production build
+```
+
+### 2. Unified Single File (Optimized for Replit)
+All server code merged into `server/main.ts` for simplified deployment.
+
+**Usage:**
+```bash
+npm run dev:unified      # Development mode with unified file
+npm run build:unified    # Build with unified file
+```
+
+See `server/UNIFIED_MAIN_README.md` for more details on the unified architecture.
+
 ## API Endpoints
 
 ### Candidates

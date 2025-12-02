@@ -46,8 +46,15 @@ async function buildAll() {
   ];
   const externals = allDeps.filter((dep) => !allowlist.includes(dep));
 
+  // Use unified main.ts if USE_UNIFIED_MAIN is set, otherwise use modular index.ts
+  const serverEntry = process.env.USE_UNIFIED_MAIN === "true" 
+    ? "server/main.ts" 
+    : "server/index.ts";
+  
+  console.log(`Building from ${serverEntry}...`);
+
   await esbuild({
-    entryPoints: ["server/index.ts"],
+    entryPoints: [serverEntry],
     platform: "node",
     bundle: true,
     format: "cjs",
