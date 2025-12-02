@@ -21,11 +21,14 @@ import {
   CheckSquare,
   CalendarDays,
   FileCheck,
-  ChevronRight
+  ChevronRight,
+  Share2
 } from 'lucide-react';
 import type { CandidateWithRelations } from '@shared/schema';
 import { cn } from '@/lib/utils';
 import logo from '@assets/baynunah-logo_1764408063481.png';
+import { usePassData } from '@/hooks/usePassData';
+import type { PassLink, PassLinkSlot, PassSettings, SlotStatus } from '@/lib/passDataStore';
 
 import { useLocation } from 'wouter';
 
@@ -34,7 +37,7 @@ interface UniversalPassProps {
 }
 
 type Persona = 'candidate' | 'manager' | 'onboarding';
-type MaintenanceKey = 'reminders' | 'docs' | 'broadcast';
+type MaintenanceKey = keyof PassSettings['automations'];
 
 // Data for the back of the card
 const CANDIDATE_BACK_DATA = {
@@ -89,15 +92,16 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
   const [showVerification, setShowVerification] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [maintenancePrefs, setMaintenancePrefs] = useState<Record<MaintenanceKey, boolean>>({
-    reminders: true,
-    docs: true,
-    broadcast: false,
-  });
   const [, setLocation] = useLocation();
-  const toggleMaintenancePref = (key: MaintenanceKey) => {
-    setMaintenancePrefs((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  const {
+    store,
+    getPassSettings: fetchPassSettings,
+    toggleModuleVisibility,
+    toggleAutomationPref,
+    getLinksForCode: fetchLinksForCode,
+    updateLinkSlot: mutateLinkSlot,
+    updatePassSettings,
+  } = usePassData();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -110,6 +114,26 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     setIsFlipped(false);
     setActiveSection(null);
   }, [candidate.code]);
+
+  const passSettings = useMemo(
+    () => fetchPassSettings(candidate.code),
+    [candidate.code, fetchPassSettings, store.lastUpdated],
+  );
+
+  const linkedFlows = useMemo(
+    () => fetchLinksForCode(candidate.code),
+    [candidate.code, fetchLinksForCode, store.lastUpdated],
+  );
+
+  const primaryLinkedSlot = useMemo(() => {
+    if (!linkedFlows.length) return null;
+    const link = linkedFlows[0];
+    const preferredSlot =
+      link.slots.find((slot) => slot.candidateCode === candidate.code && slot.status === 'booked') ??
+      link.slots.find((slot) => slot.status === 'open') ??
+      link.slots[0];
+    return { link, slot: preferredSlot };
+  }, [linkedFlows, candidate.code]);
 
   const persona: Persona = useMemo(() => {
     if (candidate.code.startsWith('REQ')) return 'manager';
@@ -136,6 +160,44 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
   };
 
   const personaCopy = personaMeta[persona];
+
+  const themeTokens: Record<PassSettings['theme'], {
+    card: string;
+    strip: string;
+    accent: string;
+    pill: string;
+  }> = {
+    light: {
+      card: 'bg-white text-slate-900',
+      strip: 'from-blue-500/20 to-blue-600/5',
+      accent: 'text-[#1E40AF]',
+      pill: 'bg-slate-100 text-slate-500',
+    },
+    dark: {
+      card: 'bg-slate-900 text-white border border-slate-700',
+      strip: 'from-slate-700/60 to-slate-900/20',
+      accent: 'text-blue-300',
+      pill: 'bg-slate-800 text-slate-200',
+    },
+    tech: {
+      card: 'bg-gradient-to-br from-[#020617] via-[#0b1a34] to-[#020617] text-slate-100 border border-slate-800',
+      strip: 'from-cyan-500/40 to-blue-500/10',
+      accent: 'text-cyan-200',
+      pill: 'bg-slate-900 text-cyan-300',
+    },
+  };
+
+  const themeToken = themeTokens[passSettings.theme];
+
+  const backMenuItems = useMemo(() => {
+    return [
+      { id: 'timeline', label: 'Timeline', icon: CalendarDays, enabled: passSettings.modules.timeline },
+      { id: 'evaluations', label: 'Assessments', icon: CheckSquare, enabled: true },
+      { id: 'next', label: 'Next', icon: ArrowRight, enabled: true },
+      { id: 'documents', label: 'Documents', icon: FileText, enabled: passSettings.modules.documents },
+      { id: 'linked', label: 'Links', icon: Share2, enabled: passSettings.modules.availability && linkedFlows.length > 0 },
+    ].filter((item) => item.enabled);
+  }, [passSettings.modules, linkedFlows.length]);
 
   const timelineStats = useMemo(() => {
     return candidate.timeline.reduce(
@@ -213,6 +275,32 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
     return 'Send micro-updates after every milestone so candidates feel guided even with a lean HR team.';
   }, [persona]);
 
+  const counterpartLabel = (code?: string) => {
+    if (!code) return 'Unassigned';
+    const counterpart = store.candidates[code];
+    return counterpart ? counterpart.name : code;
+  };
+
+  const handleCandidateSlotInteraction = (link: PassLink, slot: PassLinkSlot) => {
+    if (!passSettings.modules.availability) return;
+    if (slot.status === 'booked' && slot.candidateCode === candidate.code) {
+      mutateLinkSlot(link.id, slot.id, { status: 'open', candidateCode: undefined });
+      return;
+    }
+    if (slot.status === 'open') {
+      mutateLinkSlot(link.id, slot.id, { status: 'booked', candidateCode: candidate.code });
+    }
+  };
+
+  const handleManagerSlotStatus = (link: PassLink, slot: PassLinkSlot, nextStatus: SlotStatus) => {
+    if (!passSettings.modules.availability) return;
+    const payload: Partial<PassLinkSlot> = { status: nextStatus };
+    if (nextStatus !== 'booked') {
+      payload.candidateCode = undefined;
+    }
+    mutateLinkSlot(link.id, slot.id, payload);
+  };
+
   const toggleExpand = () => setExpanded(!expanded);
   const toggleFlip = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -221,16 +309,27 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
   };
 
   const getRoleGradient = () => {
-    return 'from-blue-500/20 to-blue-600/5';
+    return themeToken.strip;
   };
 
   const getPassType = () => {
+    if (persona === 'manager') return 'MANAGER PASS';
+    if (persona === 'onboarding') return 'ONBOARDING PASS';
     return 'CANDIDATE PASS';
   };
+
+  const renderDisabledState = (label: string) => (
+    <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center justify-center text-center text-slate-400 text-xs font-medium">
+      {label} is hidden for this pass. Enable it via the Solo HR console.
+    </div>
+  );
 
   const renderDetailContent = () => {
     switch(activeSection) {
         case 'timeline':
+            if (!passSettings.modules.timeline) {
+              return renderDisabledState('Timeline');
+            }
             return (
                 <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col overflow-hidden h-full">
                     <div className="flex items-center gap-2 mb-4 shrink-0">
@@ -311,6 +410,9 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                 </div>
             );
         case 'documents':
+            if (!passSettings.modules.documents) {
+              return renderDisabledState('Documents');
+            }
             return (
                 <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col h-full">
                         <div className="flex items-center gap-2 mb-4">
@@ -336,6 +438,91 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                             </div>
                         ))}
                     </div>
+                </div>
+            );
+        case 'linked':
+            if (!passSettings.modules.availability || linkedFlows.length === 0) {
+              return renderDisabledState('Linked passes');
+            }
+            return (
+                <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col h-full space-y-4 overflow-y-auto custom-scrollbar">
+                    {linkedFlows.map((link) => {
+                        const isManagerView = link.managerCode === candidate.code || persona === 'manager';
+                        const primarySlot = link.slots.find((slot) => slot.status === 'booked' && slot.candidateCode === candidate.code) 
+                            ?? link.slots.find((slot) => slot.status === 'open');
+                        return (
+                            <div key={link.id} className="border border-slate-100 rounded-2xl p-4 space-y-3 bg-slate-50/60">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Linked to {counterpartLabel(link.managerCode === candidate.code ? link.candidateCode : link.managerCode)}</p>
+                                        <p className="text-sm font-semibold text-slate-900">{link.title}</p>
+                                        {primarySlot && (
+                                            <p className="text-xs text-slate-500 mt-1">{primarySlot.date} · {primarySlot.time}</p>
+                                        )}
+                                    </div>
+                                    <span className="text-[10px] font-semibold text-slate-400">Updated {new Date(link.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {link.slots.map((slot) => {
+                                        const isSelectedByCandidate = slot.candidateCode === candidate.code && slot.status === 'booked';
+                                        const slotStatus = slot.status === 'booked'
+                                            ? isSelectedByCandidate ? 'Selected' : 'Booked'
+                                            : slot.status === 'held' ? 'Hold' : 'Open';
+                                        const statusColor = slot.status === 'booked'
+                                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                                            : slot.status === 'held'
+                                                ? 'bg-amber-50 text-amber-600 border border-amber-100'
+                                                : 'bg-slate-50 text-slate-500 border border-slate-100';
+                                        return (
+                                            <div key={slot.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-100 shadow-sm">
+                                                <div>
+                                                    <p className="text-sm font-semibold text-slate-900">{slot.label}</p>
+                                                    <p className="text-xs text-slate-500">{slot.date} · {slot.time}</p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={cn("text-[10px] px-2 py-1 rounded-full font-semibold uppercase tracking-widest", statusColor)}>
+                                                        {slotStatus}
+                                                    </span>
+                                                    {persona === 'candidate' && (
+                                                        <button
+                                                            onClick={() => handleCandidateSlotInteraction(link, slot)}
+                                                            disabled={slot.status === 'held' || (slot.status === 'booked' && !isSelectedByCandidate)}
+                                                            className={cn(
+                                                                "px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+                                                                isSelectedByCandidate
+                                                                    ? "bg-[#1E40AF] text-white border-[#1E40AF]"
+                                                                    : "border-slate-200 text-slate-600 hover:border-[#1E40AF] hover:text-[#1E40AF]"
+                                                            )}
+                                                        >
+                                                            {isSelectedByCandidate ? 'Release' : 'Select'}
+                                                        </button>
+                                                    )}
+                                                    {persona === 'manager' && (
+                                                        <div className="flex gap-1">
+                                                            {(['open', 'held'] as SlotStatus[]).map((status) => (
+                                                                <button
+                                                                    key={status}
+                                                                    onClick={() => handleManagerSlotStatus(link, slot, status)}
+                                                                    className={cn(
+                                                                        "px-2 py-1 rounded-lg text-[10px] font-semibold border",
+                                                                        slot.status === status
+                                                                            ? "border-[#1E40AF] text-[#1E40AF] bg-blue-50"
+                                                                            : "border-slate-200 text-slate-500 hover:border-[#1E40AF]/50"
+                                                                    )}
+                                                                >
+                                                                    {status === 'open' ? 'Open' : 'Hold'}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             );
         default: return null;
@@ -484,6 +671,63 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                 </div>
 
                 <div>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] mb-3">Field Controls</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {([
+                      { key: 'timeline', label: 'Timeline', description: 'Recruitment progress' },
+                      { key: 'documents', label: 'Documents', description: 'Secure file slots' },
+                      { key: 'availability', label: 'Availability', description: 'Linked scheduling' },
+                      { key: 'interactions', label: 'Insights', description: 'Micro tips & notes' },
+                    ] as { key: keyof PassSettings['modules']; label: string; description: string }[]).map((module) => {
+                      const enabled = passSettings.modules[module.key];
+                      return (
+                        <button
+                          key={module.key}
+                          onClick={() => toggleModuleVisibility(candidate.code, module.key)}
+                          className={cn(
+                            "p-4 rounded-2xl border text-left space-y-1 transition-all",
+                            enabled
+                              ? "border-[#1E40AF] dark:border-blue-500 bg-blue-50/70 dark:bg-blue-900/30 text-[#1E2A4A] dark:text-blue-200"
+                              : "border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600"
+                          )}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-semibold">{module.label}</span>
+                            <span className={cn(
+                              "text-[10px] font-bold uppercase tracking-widest",
+                              enabled ? "text-[#1E40AF]" : "text-slate-400"
+                            )}>
+                              {enabled ? 'Visible' : 'Hidden'}
+                            </span>
+                          </div>
+                          <p className="text-xs">{module.description}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] mb-3">Theme</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(['light', 'dark', 'tech'] as PassSettings['theme'][]).map((themeOption) => (
+                      <button
+                        key={themeOption}
+                        onClick={() => updatePassSettings(candidate.code, { theme: themeOption })}
+                        className={cn(
+                          "px-4 py-2 rounded-2xl border text-sm font-semibold capitalize transition-colors",
+                          passSettings.theme === themeOption
+                            ? "border-[#1E40AF] text-[#1E40AF] bg-blue-50"
+                            : "border-slate-200 text-slate-500 hover:border-[#1E40AF]/40"
+                        )}
+                      >
+                        {themeOption} mode
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
                   <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] mb-3">Maintenance</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
@@ -505,10 +749,10 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                     ].map((option) => (
                       <button
                         key={option.key}
-                        onClick={() => toggleMaintenancePref(option.key)}
+                        onClick={() => toggleAutomationPref(candidate.code, option.key)}
                         className={cn(
                           "p-4 rounded-2xl border text-left space-y-2 transition-all",
-                          maintenancePrefs[option.key]
+                          passSettings.automations[option.key]
                             ? "border-[#1E40AF] dark:border-blue-500 bg-blue-50/70 dark:bg-blue-900/30 text-[#1E2A4A] dark:text-blue-200"
                             : "border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600"
                         )}
@@ -517,9 +761,9 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                           <span className="text-sm font-semibold">{option.label}</span>
                           <span className={cn(
                             "text-[10px] font-bold uppercase tracking-widest",
-                            maintenancePrefs[option.key] ? "text-[#1E40AF] dark:text-blue-400" : "text-slate-400 dark:text-slate-500"
+                            passSettings.automations[option.key] ? "text-[#1E40AF] dark:text-blue-400" : "text-slate-400 dark:text-slate-500"
                           )}>
-                            {maintenancePrefs[option.key] ? "ON" : "OFF"}
+                            {passSettings.automations[option.key] ? "ON" : "OFF"}
                           </span>
                         </div>
                         <p className="text-xs">{option.description}</p>
@@ -570,7 +814,10 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
             >
               {/* FRONT FACE */}
               <div 
-                className="absolute inset-0 backface-hidden rounded-[40px] p-8 bg-white dark:bg-slate-800 flex flex-col items-center text-center group pass-card"
+                className={cn(
+                  "absolute inset-0 backface-hidden rounded-[40px] p-8 flex flex-col items-center text-center group pass-card transition-colors duration-500 border border-transparent",
+                  themeToken.card
+                )}
                 style={{ 
                     backfaceVisibility: 'hidden',
                 }}
@@ -605,10 +852,10 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
 
                     {/* Pass Type */}
                     <div className="flex flex-col items-center gap-2 mb-8">
-                        <p className="tracking-[0.2em] uppercase font-medium text-[14px] text-[#62748e] dark:text-slate-400">
+                        <p className={cn("tracking-[0.2em] uppercase font-medium text-[14px]", passSettings.theme === 'tech' ? "text-cyan-200" : "text-[#62748e]")}>
                             {getPassType()}
                         </p>
-                        <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+                        <span className={cn("px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.3em]", themeToken.pill)}>
                             {personaCopy.badge}
                         </span>
                         <p className={cn("text-[10px] font-medium max-w-[220px] leading-snug", personaCopy.accent, "dark:opacity-80")}>
@@ -648,7 +895,7 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
 
                     {/* Identity */}
                     <div className="space-y-1 mb-6">
-                        <h1 className="text-2xl font-bold tracking-tight text-[#1E40AF] dark:text-blue-400">{candidate.name}</h1>
+                        <h1 className={cn("text-2xl font-bold tracking-tight", themeToken.accent)}>{candidate.name}</h1>
                         <p className="text-slate-500 dark:text-slate-400 font-medium text-xs uppercase tracking-wider">{candidate.title}</p>
                         {candidate.department && (
                             <p className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1">{candidate.department}</p>
@@ -687,12 +934,56 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                         </button>
                     </div>
 
+                {passSettings.modules.availability && primaryLinkedSlot && (
+                    <div className="w-full mb-4 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white/80 dark:bg-slate-800/70 text-left p-4 shadow-sm">
+                        <div className="flex items-start justify-between gap-3">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Linked Availability</p>
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">{primaryLinkedSlot.link.title}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">{primaryLinkedSlot.slot.date} · {primaryLinkedSlot.slot.time}</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setIsFlipped(true);
+                                    setActiveSection('linked');
+                                }}
+                                className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 text-[11px] font-semibold text-slate-500 dark:text-slate-300 hover:border-[#1E40AF] hover:text-[#1E40AF]"
+                            >
+                                Manage
+                            </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-3">
+                            {primaryLinkedSlot.link.slots.map((slot) => {
+                                const isSelected = slot.candidateCode === candidate.code && slot.status === 'booked';
+                                const isDisabled = persona !== 'candidate' || slot.status === 'held' || (slot.status === 'booked' && !isSelected);
+                                return (
+                                    <button
+                                        key={slot.id}
+                                        onClick={() => handleCandidateSlotInteraction(primaryLinkedSlot.link, slot)}
+                                        disabled={isDisabled}
+                                        className={cn(
+                                            "px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-colors",
+                                            isSelected
+                                                ? "bg-[#1E40AF] text-white border-[#1E40AF]"
+                                                : "border-slate-200 text-slate-500 hover:border-[#1E40AF]/40 disabled:opacity-40"
+                                        )}
+                                    >
+                                        {slot.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {passSettings.modules.interactions && (
                     <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-4 max-w-[240px]">
                       {soloTip}
                     </p>
+                )}
 
-                    {/* Recruitment Status Widget - Always visible on mobile, reveals on hover on desktop */}
-                    <div className="w-full mt-auto relative">
+                {passSettings.modules.timeline && (
+                <div className="w-full mt-auto relative">
                         {/* Container: visible on mobile, hover-reveal on desktop */}
                         <div className="overflow-hidden max-h-[140px] opacity-100 md:max-h-0 md:opacity-0 md:group-hover:max-h-[140px] md:group-hover:opacity-100 transition-all duration-500 ease-out">
                             <div 
@@ -734,13 +1025,17 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                         
                         {/* Handle Indicator (Hidden on mobile, visible on desktop when widget is hidden) */}
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-200 rounded-full hidden md:block md:opacity-100 md:group-hover:opacity-0 transition-opacity duration-300 delay-100" />
-                    </div>
+                </div>
+                )}
                 </div>
               </div>
 
               {/* BACK FACE (2x2 Menu or Detail) */}
               <div 
-                className="absolute inset-0 backface-hidden rounded-[40px] p-6 bg-[#f8fafc] flex flex-col"
+                className={cn(
+                  "absolute inset-0 backface-hidden rounded-[40px] p-6 flex flex-col transition-colors duration-500",
+                  passSettings.theme === 'tech' ? "bg-[#020617] text-slate-100" : "bg-[#f8fafc]"
+                )}
                 style={{ 
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
@@ -798,58 +1093,26 @@ export default function UniversalPass({ candidate }: UniversalPassProps) {
                                 transition={{ duration: 0.2 }}
                                 className="grid grid-cols-2 gap-2 w-full max-w-[280px] mx-auto place-content-center flex-1"
                             >
-                                {/* Menu Tiles matching the attached petal design */}
-                                {/* Top Left - Timeline */}
-                                <button 
-                                    onClick={() => setActiveSection('timeline')}
-                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
-                                    style={{
-                                        borderRadius: '40px 12px 12px 12px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
-                                    }}
-                                >
-                                    <CalendarDays className="w-7 h-7 stroke-[1.5]" />
-                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Timeline</span>
-                                </button>
-
-                                {/* Top Right - Evaluations */}
-                                <button 
-                                    onClick={() => setActiveSection('evaluations')}
-                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:translate-x-0.5 hover:-translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
-                                    style={{
-                                        borderRadius: '12px 40px 12px 12px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
-                                    }}
-                                >
-                                    <CheckSquare className="w-7 h-7 stroke-[1.5]" />
-                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Evaluations</span>
-                                </button>
-
-                                {/* Bottom Left - Next Step */}
-                                <button 
-                                    onClick={() => setActiveSection('next')}
-                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:-translate-x-0.5 hover:translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
-                                    style={{
-                                        borderRadius: '12px 12px 12px 40px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
-                                    }}
-                                >
-                                    <ArrowRight className="w-7 h-7 stroke-[1.5]" />
-                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Next</span>
-                                </button>
-
-                                {/* Bottom Right - Documents */}
-                                <button 
-                                    onClick={() => setActiveSection('documents')}
-                                    className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 hover:translate-x-0.5 hover:translate-y-0.5 outline-none border-none flex flex-col items-center justify-center gap-2 group relative"
-                                    style={{
-                                        borderRadius: '12px 12px 40px 12px',
-                                        boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
-                                    }}
-                                >
-                                    <FileText className="w-7 h-7 stroke-[1.5]" />
-                                    <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">Documents</span>
-                                </button>
+                                {backMenuItems.length === 0 ? (
+                                    <div className="col-span-2 text-center text-[11px] text-slate-400">
+                                        All modules are hidden for this pass.
+                                    </div>
+                                ) : (
+                                    backMenuItems.map((item) => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setActiveSection(item.id)}
+                                            className="w-full aspect-[4/3] bg-white text-slate-400 hover:text-slate-600 transition-all duration-200 outline-none border-none flex flex-col items-center justify-center gap-2 group relative hover:-translate-y-0.5"
+                                            style={{
+                                                borderRadius: '24px',
+                                                boxShadow: 'inset 2px 2px 2px #fff, inset -2px -2px 2px #e2e8f0, 2px 2px 8px #e2e8f0'
+                                            }}
+                                        >
+                                            <item.icon className="w-7 h-7 stroke-[1.5]" />
+                                            <span className="text-[9px] font-bold uppercase tracking-widest opacity-70">{item.label}</span>
+                                        </button>
+                                    ))
+                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>
